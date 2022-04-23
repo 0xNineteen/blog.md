@@ -1,10 +1,10 @@
 # A New Perspective on BTC's POW 
 
-**TLDR;** To achieve consensus among multiple distributed machines you need to ensure a single node (the leader) can propogate state updates to the rest of the network and other nodes can all agree on that the data received was from the correct leader. BTC's POW uses its hash puzzel to elect a new leader for each block and all other nodes can confirm they recieved the txs from the leader bc they can confirm the hash is correct. 
+**TLDR;** To achieve consensus among multiple distributed machines you need to ensure a single node (the leader) can propagate state updates to the rest of the network and other nodes can all agree that the data received was from the correct leader. BTC's POW uses its hash puzzle to elect a new leader for each block and all other nodes can confirm they received the txs from the leader bc they can confirm the hash is correct. 
 
 --- 
 
-Lets say you're on the IBM database team and, for the sake of your clients, **you want your database to have an uptime of 99.99%**. How could you do this? 
+Let's say you're on the IBM database team and, for the sake of your clients, **you want your database to have an uptime of 99.99%**. How could you do this? 
 
 One 'simple' way to do this is to **duplicate your database across multiple servers across the world**. That way, if a tsunami strikes where one server is located or a server randomly crashes, you still got 99 other databases up and running which you can reroute to. 
 
@@ -18,17 +18,17 @@ But now the problem is **how do you keep all of these databases in sync? (i.e ha
 
 It's easier to introduce the topic of consensus by considering what not to do. 
 
-Consider if every node accepts all valid txs, updates their state, and sends the txs to all other nodes as soon as possible. Furthermore, they would recieve new txs from other nodes and update their state.  
+Consider if every node accepts all valid txs, updates their state, and sends the txs to all other nodes as soon as possible. Furthermore, they would receive new txs from other nodes and update their state.  
 
-Why wouldn't this work? Network problems can lead to dropped data mid transmittion, node hardware can crash mid transmition, and random bits can be flipped due to solar radiation. All these problems can lead to inconsistencies in the network state across nodes.
+Why wouldn't this work? Network problems can lead to dropped data mid transmission, node hardware can crash mid transmission, and random bits can be flipped due to solar radiation. All these problems can lead to inconsistencies in the network state across nodes.
 
-Our plan to understand the soln. will be to break consensus into two parts: 
+To derive the soln of POW, our plan will be to break consensus into two parts: 
 1. sending a tx to the network
 2. updating the network state 
 
 ## Sending a Tx to the network 
 
-When a client sends a tx to the network, **how do we know which node should recieve the request?** There are two approaches: 
+When a client sends a tx to the network, **how do we know which node should receive the request?** There are two approaches: 
 
 **(1) Send it to all the nodes:** **This is what BTC and ETH do: it's a gossip protocol** where one node broadcasts the txs it receives to every other node. 
 
@@ -48,17 +48,17 @@ We'll see later that **(1) and (2) are actually the same approach in BTC's case.
 
 Say we go with approach **(2) Send it to a leader**. Once we have a specified leader receiving updates, we then need to relay the updated state to the other nodes. But how do the nodes know the txs come from the leader? 
 
-This is when we actually need all the nodes to know each other's public keys. Furthermore, **we need the leader to broadcast it's signature along with its confirmed txs. That way each node can confirm that the block they received comes from the leader node and can saftely update their state.**
+This is when we actually need all the nodes to know each other's public keys. Furthermore, **we need the leader to broadcast its signature along with its confirmed txs. That way each node can confirm that the block they received comes from the leader node and can safely update their state.**
 
 # Bitcoin's Computer 
 
-Operating this model in a decentralized setting is where some difficulties arise. **Ideally, we want anyone to setup a node without needing to share their publickey with the network, and without setting up a clock for the leader schedule.** This is where POW comes in. 
+Operating this model in a decentralized setting is where some difficulties arise. **Ideally, we want anyone to set up a node without needing to share their public key with the network, and without setting up a clock for the leader schedule.** This is where POW comes in. 
 
-When a tx is send to the BTC network, at first glance, **BTC uses approach (1) Send it to all the nodes** where the txs are broadcasted to all the other nodes. 
+When a tx is sent to the BTC network, at first glance, **BTC uses approach (1) Send it to all the nodes** where the txs are broadcasted to all the other nodes. 
 
-The magic then comes when BTC's POW has each node try to find a hash corresponding with the block of txs, and once the hash is found, its propagated along with the txs to the rest of the network. This seems pretty arbitrary, but it actually can be connected to everything we talked about above.
+The magic then comes when BTC's POW has each node try to find a hash corresponding with the block of txs, and once the hash is found, it's propagated along with the txs to the rest of the network. This seems pretty arbitrary, but it actually can be connected to everything we talked about above.
 
-**So how does this relate to approach (2)**?
+**So how does this relate to (2)**?
 
 **Understanding POW another way**, consider that **BTC actually uses** **(2) Send it to a leader, BUT the leader is determined by whoever finds the block hash**. When the node finds the hash they are elected the leader and they propagate their block to the network. **All of the other nodes can confirm that the block received was from the leader by confirming the hash is indeed correct (less than a specific threshold).** 
 
