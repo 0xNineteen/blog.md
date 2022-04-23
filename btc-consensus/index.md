@@ -1,10 +1,10 @@
 # A New Perspective on BTC's POW 
 
-**TLDR;** To achieve consensus among multiple distributed machines you need to ensure a single node (the leader) can propagate state updates to the rest of the network and other nodes can all agree that the data received was from the correct leader. BTC's POW uses its hash puzzle to elect a new leader for each block and all other nodes can confirm they received the txs from the leader bc they can confirm the hash is correct. 
+**TLDR;** To achieve consensus among multiple distributed machines you need to ensure a single node (the leader) can propagate state updates to the rest of the network and other nodes can all agree that the data received was from the leader (and not another, maybe malicious, node). BTC's POW uses its hash puzzle to elect a new leader for each block and all other nodes can confirm they received the txs from the leader bc they can confirm the hash is correct. This means BTC's POW is a leader schedule clock which doesn't require any coordination/agreement on time between any of the other nodes.
 
 --- 
 
-Let's say you're on the IBM database team and, for the sake of your clients, **you want your database to have an uptime of 99.99%**. How could you do this? 
+Let's say you're on a database team and, for the sake of your clients, **you want your database to have an uptime of 99.99%**. How could you do this? 
 
 One 'simple' way to do this is to **duplicate your database across multiple servers across the world**. That way, if a tsunami strikes where one server is located or a server randomly crashes, you still got 99 other databases up and running which you can reroute to. 
 
@@ -22,7 +22,7 @@ Consider if every node accepts all valid txs, updates their state, and sends the
 
 Why wouldn't this work? Network problems can lead to dropped data mid transmission, node hardware can crash mid transmission, and random bits can be flipped due to solar radiation. All these problems can lead to inconsistencies in the network state across nodes.
 
-To derive the soln of POW, our plan will be to break consensus into two parts: 
+To derive a soln, our plan will be to break consensus into two parts: 
 1. sending a tx to the network
 2. updating the network state 
 
@@ -48,11 +48,11 @@ We'll see later that **(1) and (2) are actually the same approach in BTC's case.
 
 Say we go with approach **(2) Send it to a leader**. Once we have a specified leader receiving updates, we then need to relay the updated state to the other nodes. But how do the nodes know the txs come from the leader? 
 
-This is when we actually need all the nodes to know each other's public keys. Furthermore, **we need the leader to broadcast its signature along with its confirmed txs. That way each node can confirm that the block they received comes from the leader node and can safely update their state.**
+One solution is to have all the nodes know each other's public keys. Furthermore, **we need the leader to broadcast its signature along with its confirmed txs. That way each node can confirm that the block they received comes from the leader node and can safely update their state.**
 
-# Bitcoin's Computer 
+# Bitcoin's Proof-of-Work (POW) 
 
-Operating this model in a decentralized setting is where some difficulties arise. **Ideally, we want anyone to set up a node without needing to share their public key with the network, and without setting up a clock for the leader schedule.** This is where POW comes in. 
+Operating this model in a decentralized setting is where some difficulties arise. **Ideally, we want anyone to set up a node without needing to share their public key with the network, and without setting up a consistent clock for the leader schedule.** This is where POW comes in. 
 
 When a tx is sent to the BTC network, at first glance, **BTC uses approach (1) Send it to all the nodes** where the txs are broadcasted to all the other nodes. 
 
@@ -66,7 +66,7 @@ Thinking of it like this, BTC's POW is a special case of the leader schedule whe
 
 The mind-boggling thing is that this means that **BTC's POW is a leader-schedule clock which doesn't require any coordination/agreement on time between any of the other nodes.**
 
-## Proof of Stake (POS)
+# Proof of Stake (POS)
 
 coming soon ... 
 
