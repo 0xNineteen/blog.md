@@ -1,6 +1,6 @@
 # A New Perspective on BTC's POW 
 
-**TLDR;** To achieve consensus among multiple distributed machines you need to ensure a single node (the leader) can propagate state updates to the rest of the network and other nodes can all agree that the data received was from the leader (and not another, maybe malicious, node). BTC's POW uses its hash puzzle to elect a new leader for each block and all other nodes can confirm they received the txs from the leader bc they can confirm the hash is correct. This means BTC's POW is a leader schedule clock which doesn't require any coordination/agreement on time between any of the other nodes.
+**TLDR;** To achieve consensus among multiple distributed machines you need to ensure a single node (the leader) can propagate state updates to the rest of the network and other nodes can all agree that the data received was from the leader (and not another, maybe malicious, node). In BTC's POW, the node which solves the hash is elected as the leader for a block, and propogates this proof to the network. All other nodes can confirm they received the block from the leader bc they can confirm the hash is correct. This means BTC's POW is a leader schedule clock which doesn't require any coordination/agreement on time between any of the other nodes.
 
 --- 
 
