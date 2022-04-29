@@ -1,6 +1,6 @@
 # Rust Macros and Arbitrage Bots on Solana 
 
-When starting to develop in rust, macros sounded like a magical beast: really cool but no clue how to use them in practice. To learn rust, I decided to create a solana arbitrage bot in rust. While doing this, I naturally came across use cases where rust macros shined. In this post, we're gonna go over a more practicle example to understand them. 
+When starting to develop in rust, macros sounded like a magical beast: really cool but no clue how to use them in practice. While developing a solana arbitrage bot in rust, I naturally came across use cases where rust macros shined. In this post, we're gonna go over a more practicle example to understand them. 
 
 ## Arbitrage
 
