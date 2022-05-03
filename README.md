@@ -8,4 +8,4 @@ this is easier than creating a new blog website lmfao
 
 2. [Rust Macros and Arbitrage Bots on Solana](https://github.com/0xNineteen/blog.md/blob/master/rust-macros-arbitrage/index.md): Practical example of how to use rust macros. The example includes writing an arbitrage bot for Solana.
 
-3. [The Evolution of Margin in Crypto: The Birth of Perps](https://github.com/0xNineteen/blog.md/blob/master/rust-macros-arbitrage/index.md): Brief overview about understanding the pros of perps and how they work in a PvP and PvE setting.  
+3. [The Evolution of Margin in Crypto: The Birth of Perps](https://github.com/0xNineteen/blog.md/blob/master/crypto-margin-perps/index.md): Brief overview about understanding the pros of perps and how they work in a PvP and PvE setting.  
