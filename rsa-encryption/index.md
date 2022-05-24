@@ -1,57 +1,64 @@
 # RSA Public-Key Cryptography 
 
-## Public Key Cryptography Intro
+## Key-based VS Public Key 
 
-Classic crypto uses key-based encryption which assumes two parties, who want to securely communicate, have a shared secret key only known between them. The secret key is then used to encrypt and decrypt messages for secure communication. 
+If you want to securely communicate with another person, the classic approach is to use 'key-based encryption' which assumes you and the other person have a shared secret key between each other. This secret key is then used to encrypt and decrypt messages using a specific algorithm (ie, AES) for secure communication. 
 
-This naturally leads to the question of how do two parties communicate the secret key to each other? Sending the secret key directly through the internet could be intercepted leading to compromised communication.
+Now assume that you want to securely communicate with a random server on the internet. How do you agree on a secret key with the random server? You can't securely communicate without the secret key, and you can't agree on a secret key without unsecure communication. 
 
-This is where public-key crypto comes in. It allows you to securely communicate without a shared secret. At a high level, imagine two parties Alice and Bob want to communicate. In public-key crypto, Alice will send a box and a lock to Bob and will keep the key to the lock to herself. Bob can then insert his message into the vault, lock it, and send it to Alice. Alice can then unlock the vault and read the message. 
+<div align="center">
+<img src="2022-05-24-07-17-22.png" width="300" height="300">
+</div>
 
-The rest of this post will go into detail about how RSA crypto works (a standard public-key crypto algorithm). 
+This is where public-key crypto comes in. **Public-key crypto allows you to securely communicate without assuming a shared secret.** Imagine two parties Alice and Bob want to communicate. At a high-level public-key crypto works as follows: 
+
+- Alice will create a box, a lock, and a key for the lock. 
+- Alice will keep the key for the lock to herself and send the box and lock to Bob. 
+- Bob can then insert his message into the box, lock it, and send it back to Alice. 
+- Alice can use her key to unlock the lock, open the box, and read Bob's message. 
+
+Notice an attacker can only intercept either the box and the lock (on the way forward), or the locked box (on the way backwards). Neither of which can compromise the communication (we'll ignore man-in-the-middle attacks in this post). 
+
+A popular public-key crypto algorithm is RSA. The rest of this post will go into detail about how RSA works.  
 
 ## Terminology
 
 To expand the previous high-level explanation with proper terminology, at a high level, RSA works as follows: 
 
-- Alice will generate a public and private key 
+- Alice will generate a public key and a private key
 - she will send her public key to Bob 
 - Bob can then encrypt their message to Alice using her public key 
-- and send it back to Alice 
-- Alice can decrypt messages with her private key 
+- Bob can send the encrypted message to Alice 
+- Alice can decrypt the encrypted message with her private key 
 
 The public key is the box & lock, and the private key is the lock's key.
 
 ## The Algorithm 
 
+The RSA algorithm works as follows:
+
 ![RSA](2022-05-12-20-01-08.png)
 
 relating [the algorithm](https://cacr.uwaterloo.ca/hac/) back to how it works, 
 - Alice generates a public [n, e] and private key [d] [derived from two prime numbers]
-- Alice sends her public key [n, e] to everyone 
-- people encrypt their message to Alice: $m ^ e \mod n$
+- Alice sends her public key [n, e] to Bob 
+- Bob encrypts his message to Alice: $m ^ e \mod n$
     - *note:* they must represent their message using only values in the interval [0, n − 1] for correct decryption 
-- the encrypted message is sent to Alice 
+- Bob sends the encrypted message to Alice 
 - Alice decrypts the message: $(m ^ e)^d \mod n = m \mod n$
 
 ## Proving it works 
 
-- while its difficult to explain the intuition and origin behind the algorithm, it can help to prove that it works  
+While its difficult to explain the intuition and origin behind RSA, it can help to understand it by proving its encryption/decryption work.  
 
-- essentially, we want to prove: $(m^e)^d = m \mod n$
-    - where $m^e$ is the encrypted message 
-    - and $(m^e)^d = m$ is the decrypted/original message
+Essentially, we want to prove: $(m^e)^d = m \mod n$
+- where $m^e$ is the encrypted message 
+- and $(m^e)^d = m$ is the decrypted/original message
 
 first we'll prove something easier which will help us: 
 - $m^{ed} = m \mod p$
 
-with the greatest common denominator denoted as gcd, since we know that gcd $\leq$ min(m, p) $\leq$ p [footnote 1], there are two cases we need to prove: 
-1. m < p: then gcd = 1 bc p is prime (and so there aren't any other common factors)
-2. m = p: then gcd = p 
-
-*footnote 1*: bc p/N where N > p will always be < 1, aka not a whole number and thus not a gcd, so we know gcd $\leq$ p
-
-For example, consider gcd of an $m$ and prime $p=5$:
+with the greatest common denominator denoted as gcd, consider the gcd of a message $m$ and prime $p=5$:
 - gcd(m, p) = ... 
 - gcd(1, 5) = 1 (m < p)
 - gcd(2, 5) = 1 (m < p)
@@ -59,6 +66,12 @@ For example, consider gcd of an $m$ and prime $p=5$:
 - gcd(4, 5) = 1 (m < p)
 - gcd(5, 5) = 5 (m = p)
 - gcd(...any value..., 5) **cannot equal** {6, 7, 8, ...} (gcd $\leq$ min(m, p) $\leq$ p)
+
+Analyzing above, we can see that gcd $\leq$ min(m, p) $\leq$ p [footnote 1], there are two cases we need to prove: 
+1. when m < p: then **gcd = 1** bc p is prime 
+2. m = p: then **gcd = p**
+
+*footnote 1*: bc p/N where N > p will always be < 1, aka not a whole number and thus not a gcd, so we know gcd $\leq$ p
 
 ...
 
