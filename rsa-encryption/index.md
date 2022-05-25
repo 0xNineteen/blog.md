@@ -10,7 +10,11 @@ Now assume that you want to securely communicate with a random server on the int
 <img src="2022-05-24-07-17-22.png" width="300" height="300">
 </div>
 
-This is where public-key crypto comes in. **Public-key crypto allows you to securely communicate without assuming a shared secret.** Imagine two parties Alice and Bob want to communicate. At a high-level public-key crypto works as follows: 
+This is where public-key crypto comes in. **Public-key crypto allows you to securely communicate without assuming a shared secret.** Imagine two parties Alice and Bob want to communicate. 
+
+---
+
+At a high-level public-key crypto works as follows: 
 
 - Alice will create a box, a lock, and a key for the lock. 
 - Alice will keep the key for the lock to herself and send the box and lock to Bob. 
@@ -23,15 +27,7 @@ The rest of this post will go into detail about how RSA, a popular public key cr
 
 ## Terminology
 
-To expand the previous high-level explanation with proper terminology, at a high level, RSA works as follows: 
-
-- Alice generates a public key and a private key
-- Alice sends her public key to Bob 
-- Bob encrypts his message using Alice's public key 
-- Bob sends the encrypted message to Alice 
-- Alice decrypts the encrypted message with her private key 
-
-Analogously, the public key is the box and the lock, and the private key is the lock's key.
+Analogously, the box and the lock is called the public key, and the lock's key is called the private key.
 
 ## The Algorithm 
 
@@ -50,12 +46,19 @@ relating [the algorithm](https://cacr.uwaterloo.ca/hac/) back to the high-level 
 
 While its difficult to explain the intuition and origin behind RSA, it can help to understand RSA by proving its encryption/decryption works.  
 
+---
+
 Essentially, we want to prove: $(m^e)^d = m \mod n$
-- where $m^e$ is the encrypted message 
-- and $(m^e)^d = m$ is the decrypted/original message
+
+where $m^e$ is the encrypted message 
+
+and $(m^e)^d = m$ is the decrypted/original message
+
+---
 
 first we'll prove something easier: 
-- $m^{ed} = m \mod p$
+
+$m^{ed} = m \mod p$
 
 since we're working with $\mod p$, consider the greatest common denominator (gcd) of some message $m$ and the prime number $p=5$:
 - gcd(m, p) = ... 
@@ -74,35 +77,67 @@ Analyzing above, we can see that gcd(m, p) $\leq$ min(m, p) $\leq$ p [footnote 1
 
 ...
 
-then we just need to prove $m^{ed} = m \mod p$ in two cases: 
+then we just need to prove $(m^{ed} = m \mod p)$ in two cases: 
+
+---
 
 1. if gcd(m, p) = 1 ... then
-    - $m^{p-1} = 1 \mod p$ [by fermats little theorem]
-    - $(m^{(p-1)})^{k(q-1)} = 1^{k(q-1)} \mod p$ 
-    - $m^{k(p-1)(q-1)} = 1 \mod p$ [exp doesn't change right-side]
-    - $m * m^{k(p-1)(q-1)} = m * 1 \mod p$
-    - $m^{1 + k(p-1)(q-1)} = m \mod p$ 
-    - $m^{1 + k\phi} = m \mod p$ [defn of $\phi$]
-    - $m^{1 \mod \phi} = m \mod p$ [defn of $\mod \phi$]
-    - $m^{ed} = m \mod p$ [by defn of $ed$]
+
+---
+
+$m^{p-1} = 1 \mod p$ [by fermats little theorem]
+
+$(m^{(p-1)})^{k(q-1)} = 1^{k(q-1)} \mod p$ 
+
+$m^{k(p-1)(q-1)} = 1 \mod p$ [exp doesn't change right-side]
+
+$m * m^{k(p-1)(q-1)} = m * 1 \mod p$
+
+$m^{1 + k(p-1)(q-1)} = m \mod p$ 
+
+$m^{1 + k\phi} = m \mod p$ [defn of $\phi$]
+
+$m^{1 \mod \phi} = m \mod p$ [defn of $\mod \phi$]
+
+$m^{ed} = m \mod p$ [by defn of $ed$]
+
+---
 
 2. if gcd(m, p) = p ... then we can simplify both sides:
-    - right side: $m \mod p$
-        - $m * k \mod p$ [$m = k * p$ for some $k$ by defn of gcd]
-        - $p \mod p$ 
-        - $0$
-    - left side: $m^{ed}$
-        - $(k * p)^{ed} \mod p$ 
-        - $k^{ed} * p^{ed} \mod p$ [mul & exp]
-        - $0$
+
+---
+
+**right side:** $m \mod p$
+
+$m * k \mod p$ [$m = k * p$ for some $k$ by defn of gcd]
+
+$p \mod p$ 
+
+$0$
+
+--- 
+
+**left side:** $m^{ed}$
+
+$(k * p)^{ed} \mod p$ 
+
+$k^{ed} * p^{ed} \mod p$ [mul & exp]
+
+$0$
+
+---
 
 similarily, the proof is the same for the case of $q$. And so we have proved: 
-- $m^{ed} = m \mod p$
-- $m^{ed} = m \mod q$
+
+$m^{ed} = m \mod p$
+
+$m^{ed} = m \mod q$
 
 then, by the chinese remainder theorem we also have
-- $m^{ed} = m \mod (p * q)$
-- $m^{ed} = m \mod n$
+
+$m^{ed} = m \mod (p * q)$
+
+$m^{ed} = m \mod n$
 
 and that's the proof :) 
 
