@@ -38,9 +38,14 @@ The RSA algorithm works as follows:
 relating [the algorithm](https://cacr.uwaterloo.ca/hac/) back to the high-level overview, 
 - Alice generates a public [n, e] and private key [d] (derived from two prime numbers)
 - Alice sends her public key [n, e] to Bob 
-- Bob encrypts his message to Alice: $m ^ e \mod n$
+- Bob encrypts his message to Alice: 
+
+$m ^ e \mod n$
+
 - Bob sends the encrypted message to Alice 
-- Alice decrypts the message: $(m ^ e)^d \mod n = m \mod n$
+- Alice decrypts the message: 
+
+$(m ^ e)^d \mod n = m \mod n$
 
 ## Proving RSA Encryption/Decryption works 
 
