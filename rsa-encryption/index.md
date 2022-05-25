@@ -74,9 +74,9 @@ since we're working with $\mod p$, consider the greatest common denominator (gcd
 - gcd(5, 5) = 5 (m = p)
 - gcd(...any value..., 5) **cannot equal** {6, 7, 8, ...} 
 
-Analyzing above, we can see that gcd(m, p) $\leq$ min(m, p) $\leq$ p [footnote 1], and so there are two cases we need to prove: 
-1. when m < p: then **gcd = 1** bc p is prime 
-2. m = p: then **gcd = p**
+Analyzing above, we can see that gcd(m, p) $\leq$ p [footnote 1], and so there are two cases we need to prove: 
+1. m < p: then **gcd(m, p) = 1** [bc p is prime]
+2. m = p: then **gcd(m, p) = p**
 
 *footnote 1*: bc p/N < 1 when N > p, aka not a whole number. And so N > p cannot be a gcd(.., p), so we know gcd(.., p) $\leq$ p.
 
