@@ -19,19 +19,19 @@ This is where public-key crypto comes in. **Public-key crypto allows you to secu
 
 Notice an attacker can only intercept either the box and the lock (on the way forward), or the locked box (on the way backwards). Neither of which can compromise the communication (we'll ignore man-in-the-middle attacks in this post). 
 
-A popular public-key crypto algorithm is RSA. The rest of this post will go into detail about how RSA works.  
+The rest of this post will go into detail about how RSA, a popular public key crypto algorithm, works.  
 
 ## Terminology
 
 To expand the previous high-level explanation with proper terminology, at a high level, RSA works as follows: 
 
-- Alice will generate a public key and a private key
-- she will send her public key to Bob 
-- Bob can then encrypt their message to Alice using her public key 
-- Bob can send the encrypted message to Alice 
-- Alice can decrypt the encrypted message with her private key 
+- Alice generates a public key and a private key
+- Alice sends her public key to Bob 
+- Bob encrypts his message using Alice's public key 
+- Bob sends the encrypted message to Alice 
+- Alice decrypts the encrypted message with her private key 
 
-The public key is the box & lock, and the private key is the lock's key.
+Analogously, the public key is the box and the lock, and the private key is the lock's key.
 
 ## The Algorithm 
 
@@ -39,43 +39,42 @@ The RSA algorithm works as follows:
 
 ![RSA](2022-05-12-20-01-08.png)
 
-relating [the algorithm](https://cacr.uwaterloo.ca/hac/) back to how it works, 
-- Alice generates a public [n, e] and private key [d] [derived from two prime numbers]
+relating [the algorithm](https://cacr.uwaterloo.ca/hac/) back to the high-level overview, 
+- Alice generates a public [n, e] and private key [d] (derived from two prime numbers)
 - Alice sends her public key [n, e] to Bob 
 - Bob encrypts his message to Alice: $m ^ e \mod n$
-    - *note:* they must represent their message using only values in the interval [0, n − 1] for correct decryption 
 - Bob sends the encrypted message to Alice 
 - Alice decrypts the message: $(m ^ e)^d \mod n = m \mod n$
 
-## Proving it works 
+## Proving RSA Encryption/Decryption works 
 
-While its difficult to explain the intuition and origin behind RSA, it can help to understand it by proving its encryption/decryption work.  
+While its difficult to explain the intuition and origin behind RSA, it can help to understand RSA by proving its encryption/decryption works.  
 
 Essentially, we want to prove: $(m^e)^d = m \mod n$
 - where $m^e$ is the encrypted message 
 - and $(m^e)^d = m$ is the decrypted/original message
 
-first we'll prove something easier which will help us: 
+first we'll prove something easier: 
 - $m^{ed} = m \mod p$
 
-with the greatest common denominator denoted as gcd, consider the gcd of a message $m$ and prime $p=5$:
+since we're working with $\mod p$, consider the greatest common denominator (gcd) of some message $m$ and the prime number $p=5$:
 - gcd(m, p) = ... 
 - gcd(1, 5) = 1 (m < p)
 - gcd(2, 5) = 1 (m < p)
 - gcd(3, 5) = 1 (m < p)
 - gcd(4, 5) = 1 (m < p)
 - gcd(5, 5) = 5 (m = p)
-- gcd(...any value..., 5) **cannot equal** {6, 7, 8, ...} (gcd $\leq$ min(m, p) $\leq$ p)
+- gcd(...any value..., 5) **cannot equal** {6, 7, 8, ...} 
 
-Analyzing above, we can see that gcd $\leq$ min(m, p) $\leq$ p [footnote 1], there are two cases we need to prove: 
+Analyzing above, we can see that gcd(m, p) $\leq$ min(m, p) $\leq$ p [footnote 1], and so there are two cases we need to prove: 
 1. when m < p: then **gcd = 1** bc p is prime 
 2. m = p: then **gcd = p**
 
-*footnote 1*: bc p/N where N > p will always be < 1, aka not a whole number and thus not a gcd, so we know gcd $\leq$ p
+*footnote 1*: bc p/N < 1 when N > p, aka not a whole number. And so N > p cannot be a gcd(.., p), so we know gcd(.., p) $\leq$ p.
 
 ...
 
-then we can now prove the two cases: 
+then we just need to prove $m^{ed} = m \mod p$ in two cases: 
 
 1. if gcd(m, p) = 1 ... then
     - $m^{p-1} = 1 \mod p$ [by fermats little theorem]
@@ -87,7 +86,7 @@ then we can now prove the two cases:
     - $m^{1 \mod \phi} = m \mod p$ [defn of $\mod \phi$]
     - $m^{ed} = m \mod p$ [by defn of $ed$]
 
-2. if gcd(m, p) = p ... then we can simplify both sides to show they are equal:
+2. if gcd(m, p) = p ... then we can simplify both sides:
     - right side: $m \mod p$
         - $m * k \mod p$ [$m = k * p$ for some $k$ by defn of gcd]
         - $p \mod p$ 
@@ -97,7 +96,7 @@ then we can now prove the two cases:
         - $k^{ed} * p^{ed} \mod p$ [mul & exp]
         - $0$
 
-Similarily, the proof is the same for the case of $q$. And so we have proved: 
+similarily, the proof is the same for the case of $q$. And so we have proved: 
 - $m^{ed} = m \mod p$
 - $m^{ed} = m \mod q$
 
@@ -105,7 +104,7 @@ then, by the chinese remainder theorem we also have
 - $m^{ed} = m \mod (p * q)$
 - $m^{ed} = m \mod n$
 
-and that's the proof. So we know RSA's encryption and decryption work. 
+and that's the proof :) 
 
 ## Breaking RSA 
 
@@ -119,3 +118,7 @@ First, lets consider whats public and private:
 if an attacker, given (n, e), could derive d, then they could decrypt any messages sent to Alice. How can we derive d? 
 
 imagine we can decompose n and find the corresponding p and q values. Then we could compute $\phi$, followed by computing $d$. Once we have $d$ we can decrypt anything. Turns out decomposing n is very difficult for a large enough p and q values and so its pretty secure. 
+
+## Elliptic Curve Digital Signatures 
+
+... 
