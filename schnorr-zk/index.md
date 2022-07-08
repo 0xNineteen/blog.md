@@ -23,6 +23,7 @@ We first define some things:
 <div align="center">
 <img src="2022-07-07-21-12-12.png" width="700" height="500">
 </div>
+
 **figure 1** from [here](https://www.zkdocs.com/docs/zkdocs/zero-knowledge-protocols/schnorr/)
 
 Breaking this figure down further, the public inputs are q (our mod value), g (some message), and h (the message encrypted). 
