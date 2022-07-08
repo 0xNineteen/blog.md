@@ -2,7 +2,11 @@
 
 If you use crypto and own the latest shitcoins, then you own a wallet consisting of a public and private key. 
 
-**Lets say you want to prove to your friends that you own your public key (and all the shitcoins belonging to it).** One way to do so would be to show your friend your private key, but that would be bad because they could sign any transaction and steal all your NFTs. 
+**Lets say you want to prove to your friends that you own your public key (and all the shitcoins belonging to it).** One way to do so would be to show your friend your private key, but that would be bad because they could sign any transaction and steal all your shitcoins. 
+
+<div align="center">
+<img src="2022-07-07-21-47-04.png" width="450" height="300">
+</div>
 
 Ideally, you want to prove to your friend you own a private key corresponding to your public key without revealing any information about your private key. 
 
@@ -11,10 +15,10 @@ Ideally, you want to prove to your friend you own a private key corresponding to
 ## Schnorr’s Identification Protocol 
 
 We first define some things: 
-- x: is our private key 
-- g: is some value/message (can be anything)
-- h: is g encrypted with our private key 
-- q: is our modulus value (its the same as n in the last RSA post)
+- $x$: is our private key 
+- $g$: is some value/message (can be anything)
+- $h$: is g encrypted with our private key ($h = g^x$)
+- $q$: is our modulus value (its the same as $n$ in the last RSA post)
 
 ![](2022-07-07-21-12-12.png)
 **figure 1** from [here](https://www.zkdocs.com/docs/zkdocs/zero-knowledge-protocols/schnorr/)
@@ -31,7 +35,7 @@ import numpy as np
 (pub, priv) = rsa.newkeys(128)
 e = pub.e # public key 
 q = pub.n # mod value 
-x = priv.d # private key -- we want to prove we know d 
+x = priv.d # private key -- we want to prove we know x
 
 g = 19 # can be anything 
 h = pow(g, x, q) # encrypted message
