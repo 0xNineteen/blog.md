@@ -20,7 +20,9 @@ We first define some things:
 - $h$: is g encrypted with our private key ($h = g^x$)
 - $q$: is our modulus value (its the same as $n$ in the last RSA post)
 
-![](2022-07-07-21-12-12.png)
+<div align="center">
+<img src="2022-07-07-21-12-12.png" width="500" height="320">
+</div>
 **figure 1** from [here](https://www.zkdocs.com/docs/zkdocs/zero-knowledge-protocols/schnorr/)
 
 Breaking this figure down further, the public inputs are q (our mod value), g (some message), and h (the message encrypted). 
