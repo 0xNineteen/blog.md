@@ -9,3 +9,5 @@
 3. [The Evolution of Margin in Crypto: The Birth of Perps](https://github.com/0xNineteen/blog.md/blob/master/crypto-margin-perps/index.md): Brief overview about understanding the pros of perps and how they work in a PvP and PvE setting.  
 
 4. [RSA Public-Key Cryptography](https://github.com/0xNineteen/blog.md/blob/master/rsa-encryption/index.md): Proof that RSA public-key cryptography encryption and decryption works. 
+
+5. [ZK 101: Schnorr's Protocol](https://github.com/0xNineteen/blog.md/blob/master/schnorr-zk/index.md): simplest ZK proof: how to prove you know a private key without revealing it. 
