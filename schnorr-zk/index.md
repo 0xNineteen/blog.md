@@ -45,6 +45,7 @@ h = pow(g, x, q) # encrypted message
 ```
 
 The heart of the ZK proof utilizes the math theorem,
+
 $$
 x^a * x^b = x^{a + b}
 $$
@@ -88,12 +89,19 @@ assert left_side == right_side # True
 ```
 
 To know why this works we can expand the variables and simplify 
+
 $$
-g^z \stackrel{?}{=} u * h^c \\ 
+g^z \stackrel{?}{=} u * h^c 
+$$ 
+
+*Equation (1)*
+
+$$
 g^{r + x * c} \stackrel{?}{=} g^r * (g^x)^c \\
+$$
+
+$$
 g^{r + x * c} \equiv g^{r + x * c} 
 $$
 
-Notice how in (1) our friend has no information on our private key, $x$ They only know $z$, $u$, $h$, and $c$. Furthermore, we would only be able to give them a $z$ which makes (1) true if we know the private key $x$! 
-
-pretty cool stuff 
+Notice how in (1) our friend has no information on our private key, $x$ (they only know $z$, $u$, $h$, and $c$). Furthermore, we would only be able to give them a $z$ which makes (1) true if we know the private key $x$. So overall, we proved that we know our private key without revealing our private key. Thats ZK baby, woo! 
