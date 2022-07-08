@@ -21,7 +21,7 @@ We first define some things:
 - $q$: is our modulus value (its the same as $n$ in the last RSA post)
 
 <div align="center">
-<img src="2022-07-07-21-12-12.png" width="700" height="400">
+<img src="2022-07-07-21-12-12.png" width="700" height="500">
 </div>
 **figure 1** from [here](https://www.zkdocs.com/docs/zkdocs/zero-knowledge-protocols/schnorr/)
 
