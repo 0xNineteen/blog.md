@@ -10,4 +10,4 @@
 
 4. [RSA Public-Key Cryptography](https://github.com/0xNineteen/blog.md/blob/master/rsa-encryption/index.md): Proof that RSA public-key cryptography encryption and decryption works. 
 
-5. [ZK 101: Schnorr's Protocol](https://github.com/0xNineteen/blog.md/blob/master/schnorr-zk/index.md): one of the simplest ZK proofs which proves you know a private key without revealing it. 
+5. [ZK 101: Schnorr's Protocol](https://github.com/0xNineteen/blog.md/blob/master/schnorr-zk/index.md): One of the simplest ZK proofs in the book: proving you own a private key without revealing it (python code included).
