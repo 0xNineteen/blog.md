@@ -6,9 +6,9 @@ TLDR; perps give you access to margin trading without taking on borrow/loan fees
 
 Before we talk about decentralized margin, it can be helpful to understand how centralized margin accounts work: 
 
-Let's say you deposit \$100 into your bank (100\$ of collateral), and you want to buy 2 shares of a 100\$ stock (this would be a 2x long). The bank/broker uses their capital to buy the two shares and holds your 100\$ collateral.
+Let's say you deposit 100<span>$</span> into your bank (100<span>$</span> of collateral), and you want to buy 2 shares of a 100<span>$</span> stock (this would be a 2x long). The bank/broker uses their capital to buy the two shares and holds your 100<span>$</span> collateral.
 
-While the price fluctuates, the bank watches your position and the price of the stock. If the stock drops to \$50, you've lost (2 shares * -\$50) = -\$100, i.e, you've lost all the collateral the bank has, and so the bank would sell the 2 shares and collect your collateral for themselves (you got liquidated). They would also likely charge you a fee for the liquidation. 
+While the price fluctuates, the bank watches your position and the price of the stock. If the stock drops to <span>$</span>50, you've lost (2 shares * -\$50) = -<span>$</span>100, i.e, you've lost all the collateral the bank has, and so the bank would sell the 2 shares and collect your collateral for themselves (you got liquidated). They would also likely charge you a fee for the liquidation. 
 
 Notice how much work the bank is doing throughout the process: 
 - using their $$ buy additional shares for leverage 
@@ -45,9 +45,9 @@ In a PvP setting, you have to find another trader to take the opposite side of t
 
 Once you find a trader, agree on the start-price of BTC, as time passes, how do you settle your PnL? 
 
-Let's say you're 10x long 1 ETH through a PvP perp and ETH goes up 10\$. Then your PnL is now +100\$ (+10\$ x 10). To get your profits in the PvP perp, you have the other trader pay you X\% of the total PnL per hour. For example, if you and the trader agree to X\% = 10\%, then you will get paid [10\% of +100\$ PnL] per hour = [10\$] per hour. In this case, after 10 hours, you will have your full PnL of +100\$ from your 10x long. 
+Let's say you're 10x long 1 ETH through a PvP perp and ETH goes up 10<span>$</span>. Then your PnL is now +100<span>$</span> (+10<span>$</span> x 10). To get your profits in the PvP perp, you have the other trader pay you X\% of the total PnL per hour. For example, if you and the trader agree to X\% = 10\%, then you will get paid [10\% of +100<span>$</span> PnL] per hour = [10<span>$</span>] per hour. In this case, after 10 hours, you will have your full PnL of +100<span>$</span> from your 10x long. 
 
-*Note:* If ETH went down 10\$ you would pay the other trader 10\$ per hour. 
+*Note:* If ETH went down 10<span>$</span> you would pay the other trader 10<span>$</span> per hour. 
 
 *Note:* The choice of the funding rate \% (10\%) and funding rate period (1 hour) can be chosen arbitrarily. 
 
