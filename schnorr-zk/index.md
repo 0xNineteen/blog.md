@@ -102,3 +102,5 @@ $$
 *Footnote:* You can also checkout *homomorphic hiding* which is a way to operate on encrypted data.
 
 Notice how in (1) our friend has no information on our private key ($x$) since they only know $z$, $u$, $h$, and $c$. Furthermore, we would only be able to give them a $z$ which makes (1) true if we know the private key $x$. So overall, we proved that we know our private key without revealing our private key. Thats ZK baby, woo! 
+
+*Note:* **full python code is available [here](https://github.com/0xNineteen/blog.md/blob/master/schnorr-zk/index.py)**
