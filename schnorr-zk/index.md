@@ -47,14 +47,14 @@ We'll then share the values for $q$ (our mod value), $g$ (some message), and $h$
 
 ---
 
-The first step of the protocol is to generate a random value $r$ and encrypt $g$ with it ($g^r$) to derive $u$. We'd then send $u$ to our friend. 
+The first step of the protocol is to generate a random value $r$ and encrypt $g$ with it ($g^r$) to derive $u$. We'll then send $u$ to our friend. 
 
 ```python 
 r = np.random.randint(0, 1e3)
 u = pow(g, r, q)
 ```
 
-The friend computes a new random value $c$ and sends it back to us. 
+Next, our friend computes a new random value $c$ and sends it back to us. 
 
 ```python 
 c = np.random.randint(0, 1e3)
@@ -66,7 +66,7 @@ We then compute $z = r + x * c$ and send $z$ to our friend.
 z = r + x * c 
 ```
 
-They can then check if the following equality holds:
+Our friend can then check if the following equality holds:
 
 $$
 \begin{equation}
@@ -97,7 +97,7 @@ $$
 g^{r + x * c} \equiv g^{r + x * c} 
 $$
 
-*Note:* The heart of the ZK proof utilizes the math theorem $x^a * x^b = x^{a + b}$
+*Note:* The heart of the ZK proof utilizes the math theorems $x^a * x^b = x^{a + b}$ and $(x^a)^b = x^{a * b}$
 
 *Footnote:* You can also checkout *homomorphic hiding* which is a way to operate on encrypted data.
 
