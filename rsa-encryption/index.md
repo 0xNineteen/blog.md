@@ -159,6 +159,8 @@ if an attacker, given (n, e), could derive d, then they could decrypt any messag
 
 imagine we can decompose n and find the corresponding p and q values. Then we could compute $\phi$, followed by computing $d$. Once we have $d$ we can decrypt anything. Turns out decomposing n is very difficult for a large enough p and q values and so its pretty secure. 
 
+*Note:* In practice, typically public-key crypto/rsa is used to establish an shared secret between two parties which is then used with more efficient key-based encryption methods such as AES to communicate larger amounts of data
+
 ## Elliptic Curve Digital Signatures 
 
 ... 
