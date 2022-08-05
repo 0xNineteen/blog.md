@@ -1,8 +1,6 @@
 # PEV: Protocol Extractable Value (/Protocol-level MEV)
 
-**tldr;** if protocols record requests and then execute the requests in batches with a specific ordering (instead of immediately processing each instruction) based on an auction system (where the winner of the auction can be the highest bidder or the bidder with the largest amount of the protocol's token) then they can enable protocol-extractable value (PEV). This value is taken away from validators/nodes and given directly to the protocols which can go directly back to the protocol's dao, treasury, or users. 
-
---- 
+**tldr;** currently, most protocols process requests immediately, but if protocols record requests and then execute the requests in batches with a specific ordering based on an auction system (where the winner of the auction can be the highest bidder or the bidder with the largest amount of the protocol's token) then they can enable protocol-extractable value (PEV). This value is taken away from validators/nodes and can be given directly to the protocols which can go directly back to the protocol's dao, treasury, or users. 
 
 ## Introduction
 
@@ -17,7 +15,7 @@ so the searchers pay the validators a certain amount to use their ordering. Howe
 </div>
 
 To gain a better understanding, it's helpful to understand how a protocol can emulate a validator based on implementation. For 
-example, consider a protocol which collects N requests (eg, an example request could be "swap 50 ETH for BTC") and then executes all the 
+example, consider a protocol which collects N requests (eg, an example request for an AMM could be "swap 50 ETH for BTC") and then executes all the 
 requests on the N+1th request. Similar to a validator producing blocks of txs, the protocol is producing protocol-level blocks: txs that only interact with the protocol. 
 
 Now consider if the protocol allows for users to bid on 
@@ -30,7 +28,7 @@ when all that code belongs to a single protocol, the searchers should be able to
 ## Winning PEV Orderings
 
 Naturally, when we're talking about an auction (for code execution), we need to define
-who wins the auction. While most blockchains require their payment in the chain's native token (SOL on solana, ETH on ethereum, etc) since the protocol is designing the auction code themselves, they can decide the auction winner based on the criteria which best fits the protocol's needs: 
+who wins the auction. While most blockchains require their payment in the chain's native token (SOL on solana, ETH on ethereum, etc) since the protocol is designing the auction code themselves, they can decide the auction winner based on a much more flexible criteria which best fits the protocol's needs: 
 - payment in the *protocol's* native token
 - payment in a stablecoin
 - the amount of the protocol's native token that is *staked*
@@ -46,9 +44,8 @@ best of both worlds: extractable value while remaining composable with other dap
 ## What's Happening Now 
 
 This means protocols are currently giving their MEV to the validators. If protocols 
-begin to implement validator-like logic in their contracts this could unlock more value 
-to the protocol users, the value could go back to the community/dao, or just lead
-to an increase in revenue. 
+begin to implement validator-like logic in their contracts this could enable protocols to capture more value which can go 
+back to protocol's dao, treatury, or users. 
 
 ## AMM Swaps with PEV POC 
 
