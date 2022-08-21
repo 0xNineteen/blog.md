@@ -1,6 +1,11 @@
 # PEV: Protocol Extractable Value
 
+
 **tldr;** validators can extract value from chains because they decide transaction orderings however, if protocols start to record requests and execute the requests in batches, then protocols can enable begin to extract MEV/PEV (Protocol Extractable Value) which can be given to the protocol's dao, treasury, or users. 
+
+## Acknowledgements 
+
+s/o to [bigz_Pubkey](https://twitter.com/bigz_Pubkey) for bringing up the key ideas of PEV and the great discussions on the topic.
 
 ## Introduction
 
@@ -37,6 +42,16 @@ who wins the auction. While most blockchains require their payment in the chain'
 
 This is very similar to how the cosmos blockchain allows protocols to run their chain so that protocols can define their own validator logic. While in cosmos you lose
 the ability to compose with other dapps built on the other chains (ie, going from ETH to cosmos you lose composability with all other ETH dapps). In this scenario, you get more of both worlds: extractable value while remaining composable with other dapps. 
+
+## PEV Tax
+
+Another interesting idea is for the protocol to tax specific PEV txs. For example, consider an AMM protocol that contains multiple pools of tokens and arbitrage opportunities exist sometimes. Since searchers will usually submit their arbitrage txs atomically (ie, a single tx including multiple instructions that swap between pools) the protocol should be able to detect such txs and if the arbitrage is successful (ie, the searcher ends with more balance than they started with) then the protocol can tax a certain percentage of the profit (eg, 5% of the profit goes to the treasury). 
+
+Ideally, the tax will be as large as possible for the protocol to earn the most profit, while not so large that the searchers stop executing the arbitrage txs. For example, if the searchers will only execute their arbitrage strategy if they earn at least <span>$</span>1K per month due to energy/server fees, then the protocol should adjust their tax rate so that the searchers earn approx <span>$</span>100 per month. For example, if there is <span>$</span>100K of PEV per month on the protocol and the protocol notices 10 searchers are arbitraging, then they could set the tax rate to (100,000 - 10 * 100) / 100,000 = 99% (lol) and earn 99K in additional profit for their dao/users.  
+
+## User Experience: More Value More Wait 
+
+While recording and ordering txs in the code allows for protocols to extract additional value, one problem is that users need to wait longer for their transactions to confirm because not only does their tx need to be put in a chain-level block (which requires N txs), but also a protocol-level block (which requires N protocol txs). This is a trade-off that the protocol will need to decide if its worth it or not.
 
 ## What's Happening Now 
 
@@ -79,7 +94,3 @@ def place_ordering_bid(bid_amount: int, ordering: Ordering):
 Similar to PEV but instead using a general auction-based ordering, [cowswap](https://cow.fi/) defends against toxic MEV
 by allowing searchers to submit orderings which achieve the best price improvement for the users who want to swap
 (based on some criteria) and the ordering which achieves the best price improvement earns a slice of the total fees. 
-
-## Acknowledgements 
-
-s/o to [bigz_Pubkey](https://twitter.com/bigz_Pubkey) for bringing up the idea of how protocols can extract value since they decide the code execution and the great discussions on the topic. 
