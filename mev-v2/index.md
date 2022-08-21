@@ -1,6 +1,6 @@
 # PEV: Protocol Extractable Value
 
-**tldr;** validators are able to extract value from chains due to their ability to decide transaction orderings however, if protocols start to record requests and execute the requests in batches, then protocols can enable begin to extact MEV/PEV (Protocol Extractable Value) which can be given to the protocol's dao, treasury, or users. 
+**tldr;** validators can extract value from chains because they decide transaction orderings however, if protocols start to record requests and execute the requests in batches, then protocols can enable begin to extract MEV/PEV (Protocol Extractable Value) which can be given to the protocol's dao, treasury, or users. 
 
 ## Introduction
 
@@ -17,7 +17,7 @@ example, consider a protocol which collects N requests (eg, an example request f
 requests on the N+1th request. Similar to a validator producing blocks of txs, the protocol is producing protocol-level blocks: txs that only interact with the protocol. 
 
 Now consider if the protocol allows for users to bid on 
-a certain ordering of the requests and the ordering which corresponds with the highest bid is executed. This is protocol extractable value (PEV).
+a certain ordering of the requests and the ordering which corresponds with the highest bid is executed. This is "protocol extractable value" (PEV). An even more interesting ideal is to consider if the protocol itself can place a bid and decide the ordering that works best for it. 
 
 Another way to think of it is since validators are paid to execute transactions in a specific ordering and transactions 
 are just chunks of code, searchers are paying for a specific execution of code, and 
@@ -26,7 +26,7 @@ when all that code belongs to a single protocol, the searchers should be able to
 ## Winning PEV Orderings
 
 Naturally, when we're talking about an auction (for code execution), we need to define
-who wins the auction. While most blockchains require their payment in the chain's native token (SOL on solana, ETH on ethereum, etc) since the protocol is designing the auction code themselves, they can decide the auction winner based on a much more flexible criteria which best fits the protocol's needs: 
+who wins the auction. While most blockchains require their payment in the chain's native token (SOL on solana, ETH on ethereum, etc) since the protocol is designing the auction code themselves, they can decide the auction winner based on a much more flexible criterion which best fits the protocol's needs: 
 - payment in the *protocol's* native token
 - payment in a stablecoin
 - the amount of the protocol's native token that is *staked*
@@ -80,6 +80,6 @@ Similar to PEV but instead using a general auction-based ordering, [cowswap](htt
 by allowing searchers to submit orderings which achieve the best price improvement for the users who want to swap
 (based on some criteria) and the ordering which achieves the best price improvement earns a slice of the total fees. 
 
-## Acknowlegements 
+## Acknowledgements 
 
-s/o bigz for bringing up the idea and the great discussions. 
+s/o to [bigz_Pubkey](https://twitter.com/bigz_Pubkey) for bringing up the idea of how protocols can extract value since they decide the code execution and the great discussions on the topic. 
