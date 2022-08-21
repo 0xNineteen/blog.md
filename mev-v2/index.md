@@ -24,7 +24,7 @@ requests on the N+1th request. Similar to a validator producing blocks of txs, t
 *Note:* this definition is similar to an L2 chain. 
 
 Now consider if the protocol allows for users to bid on 
-a certain ordering of the requests and the ordering which corresponds with the highest bid is executed. This is "protocol extractable value" (PEV). An even more interesting ideal is to consider if the protocol itself can place a bid and decide the ordering that works best for it. 
+a certain ordering of the requests and the ordering which corresponds with the highest bid is executed. This is "protocol extractable value" (PEV). An even more interesting idea is to consider if the protocol itself can place a bid and decide the ordering that works best for it. 
 
 Another way to think of it is since validators are paid to execute transactions in a specific ordering and transactions 
 are just chunks of code, searchers are paying for a specific execution of code, and 
