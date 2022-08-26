@@ -30,7 +30,7 @@ when all that code belongs to a single protocol, the searchers should be able to
 
 ## Winning PEV Orderings
 
-Naturally, when we're talking about an auction (for code execution), we need to define
+Naturally, since we're talking about an auction for code execution, we need to define
 who wins the auction. While most blockchains require their payment in the chain's native token (SOL on solana, ETH on ethereum, etc) since the protocol is designing the auction code themselves, they can decide the auction winner based on a much more flexible criterion which best fits the protocol's needs: 
 - payment in the *protocol's* native token
 - payment in a stablecoin
