@@ -19,9 +19,7 @@ transactions (txs) and searchers are the users who find money-making opportuniti
 
 To gain a better understanding, it's helpful to understand how a protocol can emulate a validator based on implementation. For 
 example, consider a protocol which collects N requests (eg, an example request for an AMM could be "swap 50 ETH for BTC") and then executes all the 
-requests on the N+1th request. Similar to a validator producing blocks of txs, the protocol is producing protocol-level blocks: txs that only interact with the protocol. 
-
-*Note:* this definition is similar to an L2 chain. 
+requests on the N+1th request. Similar to a validator producing blocks of txs, the protocol is producing protocol-level blocks: txs that only interact with the protocol (similar to an L2 chain). 
 
 Now consider if the protocol allows for users to bid on 
 a certain ordering of the requests and the ordering which corresponds with the highest bid is executed. This is "protocol extractable value" (PEV). An even more interesting idea is to consider if the protocol itself can place a bid and decide the ordering that works best for it. 
