@@ -51,7 +51,7 @@ Ideally, the tax will be as large as possible for the protocol to earn the most 
 
 ## User Experience: More Value More Wait 
 
-While recording and ordering txs in the code allows for protocols to extract additional value, one problem is that users need to wait longer for their transactions to confirm because not only does their tx need to be put in a chain-level block (which requires N txs), but also a protocol-level block (which requires N protocol txs). This is a trade-off that the protocol will need to decide if its worth it or not.
+While recording and ordering txs in the code allows for protocols to extract additional value, this also requires users to wait longer for their transactions to be confirmed. Not only do the users need their tx to be put in a chain-level block but they also need to wait for a protocol-level block (which requires N protocol-level txs). This introduces an interesting parameter of how many txs to include in a protocol-level block: the more txs included in each block should lead to more value extraction opportunities however this may also lead to longer wait times for the user. 
 
 ## What's Happening Now 
 
