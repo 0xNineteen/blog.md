@@ -12,4 +12,4 @@
 
 6. [PEV: Protocol Extractable Value](https://github.com/0xNineteen/blog.md/blob/master/mev-v2/index.md): How protocols are in the position to extract value (which is currently being extracted by validators) that can generate more revenue for the protocol's dao, treasury, or users. 
 
-7. [Drift V2: DAMM JIT](https://twitter.com/0xNineteen/status/1571926865681711104?s=20&t=NoH3aXLAh7DRgxh46T8j-w): Drift v2 has a JIT feature where makers can make taker orders before they fill against the DAMM. DAMM JIT allows the DAMM to take some of these makers order so its long/short imbalance is improved; the protocol essentially frontruns maker orders (PEV example irl). 
+7. [Drift V2: DAMM JIT](https://twitter.com/0xNineteen/status/1571926865681711104?s=20&t=NoH3aXLAh7DRgxh46T8j-w): DAMM JIT allows the DAMM to take a slice of maker orders so its long/short imbalance is always guaranteed to improve; the protocol essentially frontruns maker orders (PEV example irl). 
