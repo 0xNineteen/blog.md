@@ -11,3 +11,5 @@
 5. [ZK 101: Schnorr's Protocol](https://github.com/0xNineteen/blog.md/blob/master/schnorr-zk/index.md): One of the simplest ZK proofs in the book: proving you own a private key without revealing it (python code included).
 
 6. [PEV: Protocol Extractable Value](https://github.com/0xNineteen/blog.md/blob/master/mev-v2/index.md): How protocols are in the position to extract value (which is currently being extracted by validators) that can generate more revenue for the protocol's dao, treasury, or users. 
+
+7. [Drift V2: DAMM JIT](https://twitter.com/0xNineteen/status/1571926865681711104?s=20&t=NoH3aXLAh7DRgxh46T8j-w): ...
