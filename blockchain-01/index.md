@@ -7,6 +7,7 @@
 
 - important part is the signature chain 
 - if there are f evil nodes, than once you have f+1 rounds there will be atleast 1 honest node voting for a different value than the evil nodes which will lead to |extr| > 1 which leads to outputing 0
+- checkout dolev.ipynb in folder for python impl
 
 ## Byzantine Broadcast Definition
 - how do we know this is a good protocol? - leads to the definition of **byzantine broadcast**
