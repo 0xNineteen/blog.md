@@ -1,8 +1,38 @@
+general gpt-3 prompts used to write post:
+
+--- 
+Bullet points to paragraphs
+
+> Write a paragraph about how fuzzy testing can improve blockchain protocol's security using the following bullet points as the structure:
+> - .... bullet points ...  
+
+--- 
+Title generation
+
+> Generate a title from the following text:
+> 
+> ... full text ... 
+> 
+> Title: 
+
+--- 
+tldr generation
+
+> Generate a short summary of the following text:
+> 
+> ... full text ... 
+> 
+> Summary: 
+--- 
+
 # Building Robust Protocols With Simulations
-- most protocols seem to rely on rust or js test to ensure everything works as expected
+- smart contract security relies on tests
+- simple unit tests are used
 - this handles simple cases but cant handle more complex interactions 
   - eg, can handle 1 user opening a long but cant handle 100 users opening random positions 
-- simulating larger interactions can lead to finding edge cases and complex interactions which can lead to discovering new bugs 
+- larger simulations = more complex interactions and edge cases to discovering new bugs 
+
+## Large Scale Simulations
 - large simulations cant test things which unit tests cant but how do we actually find the bugs? 
   - invariants 
 - invariants are statements which should always hold true for your protocol 
@@ -13,11 +43,14 @@
 - these large simulations are similar to fuzz testing where random inputs are given to functions to discover bugs 
 
 ## Verifying Mainnets Saftey
-- testing different states 
-  - while large simulations can test random scenarios, sometimes its better to test against the state of mainnet 
-    - eg, if everyone were to be closed out right now, would all the pnl add up? 
-    - this leads to cloning the mainnet state, loading the state into a local validator, and then running a predeterminted list of interactions (everyone closes)
-    - this can be run like a bot and when things dont add up - alarms can be set off to fix the problem before it becomes a problem 
+
+- random interactions tests random states 
+- good for finding edge cases 
+- not always realistic states
+- so sometimes its better to test against the current state on mainnet 
+  - eg, if everyone were to be closed out right now, would all the pnl add up? 
+- this leads to cloning the mainnet state, loading the state into a local validator, and then running a predeterminted list of interactions (everyone closes)
+- this can be run like a bot and when things dont add up - alarms can be set off to fix the problem before it becomes a problem 
 
 ## Reproducability 
 - reproducability and simulation unit tests
