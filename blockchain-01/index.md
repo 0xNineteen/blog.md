@@ -9,8 +9,7 @@
 - if there are f evil nodes, than once you have f+1 rounds there will be atleast 1 honest node voting for a different value than the evil nodes which will lead to |extr| > 1 which leads to outputing 0
 
 ## Byzantine Broadcast Definition
-`
-- how do we know this is a good protocol - leads to the definition of **byzantine broadcast**
+- how do we know this is a good protocol? - leads to the definition of **byzantine broadcast**
   - consistency: honest nodes output the same value 
   - validitiy: if the sender is honest and sends b then all the honest nodes output b
 
@@ -18,10 +17,13 @@
 - blockchain that deals with more than a single bit 
 - 1 leader = 1 epoch - selected by random leader 
 - assume f < n/3 
-- propose by the leader, vote by every other node 
-  - 2/3 * n votes by distinct nodes and extends one of the longest chains = notarized 
+- block is propose by the leader, and every node votes if valid to every other node 
+  - 2/3 * n votes by distinct nodes and extends one of the longest chains = confirmed 
 
 - the important part is that if you get 2/3 votes its easy to prove consistency and validity 
+  - 2/3 is a special number 
+- requires a consistent clock across all nodes (eg, wait 10 seconds for leader to broadcast and collect votes or skip and move to next leader)
+  - ETH vs SOL have different solutions to a consistent clock - ETH actually uses the local clock with some tricks (i think) while SOL requires the nodes to constently producing chained hashes to prove time has passed
 
 ## BTC 
 - leader = defined by solving a crypto puzzel and the solution to the puzzel = their signature 
