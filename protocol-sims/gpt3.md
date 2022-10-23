@@ -3,7 +3,7 @@
 **tldr;** Fuzzy testing and large-scale simulations can help improve blockchain protocol security by discovering bugs and anomalies that simple unit tests cannot. Additionally, these simulations can be used to find the optimal parameters for a market—all leading to a more stable and secure protocol.
 
 <div align="center">
-<img src="2022-10-23-13-54-41.png" width="450" height="450">
+<img src="2022-10-23-13-54-41.png" width="350" height="350">
 </div>
 
 ## Large-Scale Simulations
