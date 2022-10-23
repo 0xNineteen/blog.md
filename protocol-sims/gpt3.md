@@ -2,6 +2,10 @@
 
 **tldr;** Fuzzy testing and large-scale simulations can help improve blockchain protocol security by discovering bugs and anomalies that simple unit tests cannot. Additionally, these simulations can be used to find the optimal parameters for a market—all leading to a more stable and secure protocol.
 
+<div align="center">
+<img src="2022-10-23-13-54-41.png" width="450" height="300">
+</div>
+
 ## Large-Scale Simulations
 
 Smart contract security relies on tests to ensure that the code is functioning as intended. Simple unit tests are typically used to test individual functions or small pieces of code however, unit tests can only handle simple cases and cannot check for bugs within more complex interactions. For example, a unit test may be able to verify everything is ok when a single user opens a long position, but it's likely unable to check everything's ok with 100 users opening random positions. 
