@@ -35,6 +35,10 @@
 
 ## Other Resources
 http://elaineshi.com/docs/blockchain-book.pdf - best resource imo on basics
+
 https://decentralizedthoughts.github.io/ - second best; good for cross-checking
+
 https://www.youtube.com/watch?v=rKGhbC6Uync - good video series to learn more from 
+
 https://nakamotoinstitute.org/literature/ - interesting historical notes on btc
+
