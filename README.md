@@ -15,3 +15,5 @@
 7. [Drift V2: DAMM JIT](https://twitter.com/0xNineteen/status/1571926865681711104?s=20&t=NoH3aXLAh7DRgxh46T8j-w): new feature that allows the AMM to take a slice of maker orders so its long/short imbalance is always guaranteed to improve; the protocol essentially frontruns maker orders (PEV example irl). 
 
 8. [Fuzzy Testing and Large-Scale Simulations For Improved Protocols](https://github.com/0xNineteen/blog.md/blob/master/protocol-sims/gpt3.md): How fuzzy testing and large-scale simulations can help improve blockchain protocol security by discovering bugs and anomalies that simple unit tests cannot.
+
+9. [Consensus 101: The Dolev-Strong Protocol](https://github.com/0xNineteen/blog.md/blob/master/blockchain-01/dolev.ipynb): Python implementation of the Dolev-Strong Protocol which works even with 99% evil nodes.  
