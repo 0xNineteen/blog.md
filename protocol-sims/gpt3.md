@@ -12,7 +12,7 @@ Smart contract security relies on tests to ensure that the code is functioning a
 
 ## Finding Bugs in Large Sims: Invariants
 
-While large-scale simulations can test things that unit tests cannot, how can we find the bugs within them? One way is with invariants. Invariants are statements which should always hold for your protocol. For example, one invariant we use in Drift is that the net user's position equals the number of longs plus the number of shorts. Throughout the simulations, you simply check that these invariants still hold after each interaction. When these invariants are false, errors are thrown and bugs can be found--similar to fuzz testing where random inputs are given to functions to discover bugs.
+While large-scale simulations can test things that unit tests cannot, how can we find the bugs within them? One way is with invariants. Invariants are statements which should always hold for your protocol. For example, one invariant we use in [Drift](https://www.drift.trade/) is that the net user's position equals the number of longs plus the number of shorts. Throughout the simulations, you simply check that these invariants still hold after each interaction. When these invariants are false, errors are thrown and bugs can be found--similar to fuzz testing where random inputs are given to functions to discover bugs.
 
 Note: The [validation/market.rs](https://github.com/drift-labs/protocol-v2/blob/72090942f5d880179f037911c8688175b74cbdde/programs/clearing_house/src/validation/market.rs#L11) file in the Drift repository includes all the invariants we check for our Market struct in Drift. The [orders.rs](https://github.com/drift-labs/protocol-v2/blob/72090942f5d880179f037911c8688175b74cbdde/programs/clearing_house/src/controller/orders.rs#L661) file checks invariants on the market and user account whenever an order is fulfilled.
 
@@ -46,4 +46,4 @@ If you want to test out Drift simulations in python, check out the drift-sim rep
 
 s/o to GPT-3 for co-authoring this post with me.
 
-s/o to [bigz_Pubkey](https://twitter.com/bigz_Pubkey) for deriving most of the invariants and working with me on the simulations @ Drift.
+s/o to [bigz_Pubkey](https://twitter.com/bigz_Pubkey) for deriving most of the invariants and working with me on the simulations @ [Drift](https://www.drift.trade/).
