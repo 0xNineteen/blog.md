@@ -19,10 +19,10 @@ transactions (txs) and searchers are the users who find money-making opportuniti
 
 To gain a better understanding, it's helpful to understand how a protocol can emulate a validator based on implementation. For 
 example, consider a protocol which collects N requests (eg, an example request for an AMM could be "swap 50 ETH for BTC") and then executes all the 
-requests on the N+1th request. Similar to a validator producing blocks of txs, the protocol is producing protocol-level blocks: txs that only interact with the protocol. 
+requests on the N+1th request. Similar to a validator producing blocks of txs, the protocol is producing protocol-level blocks: txs that only interact with the protocol (similar to an L2 chain). 
 
 Now consider if the protocol allows for users to bid on 
-a certain ordering of the requests and the ordering which corresponds with the highest bid is executed. This is "protocol extractable value" (PEV). An even more interesting ideal is to consider if the protocol itself can place a bid and decide the ordering that works best for it. 
+a certain ordering of the requests and the ordering which corresponds with the highest bid is executed. This is "protocol extractable value" (PEV). An even more interesting idea is to consider if the protocol itself can place a bid and decide the ordering that works best for it. 
 
 Another way to think of it is since validators are paid to execute transactions in a specific ordering and transactions 
 are just chunks of code, searchers are paying for a specific execution of code, and 
@@ -30,7 +30,7 @@ when all that code belongs to a single protocol, the searchers should be able to
 
 ## Winning PEV Orderings
 
-Naturally, when we're talking about an auction (for code execution), we need to define
+Naturally, since we're talking about an auction for code execution, we need to define
 who wins the auction. While most blockchains require their payment in the chain's native token (SOL on solana, ETH on ethereum, etc) since the protocol is designing the auction code themselves, they can decide the auction winner based on a much more flexible criterion which best fits the protocol's needs: 
 - payment in the *protocol's* native token
 - payment in a stablecoin
@@ -45,13 +45,13 @@ the ability to compose with other dapps built on the other chains (ie, going fro
 
 ## PEV Tax
 
-Another interesting idea is for the protocol to tax specific PEV txs. For example, consider an AMM protocol that contains multiple pools of tokens and arbitrage opportunities exist sometimes. Since searchers will usually submit their arbitrage txs atomically (ie, a single tx including multiple instructions that swap between pools) the protocol should be able to detect such txs and if the arbitrage is successful (ie, the searcher ends with more balance than they started with) then the protocol can tax a certain percentage of the profit (eg, 5% of the profit goes to the treasury). 
+Another interesting idea is for the protocol to tax specific PEV txs. For example, consider an AMM protocol that contains multiple pools of tokens where arbitrage opportunities sometimes exist. Since searchers will usually submit their arbitrage txs atomically (ie, a single tx including multiple instructions that swap between pools) the protocol should be able to detect such txs and if the arbitrage is successful (ie, the searcher ends with more balance than they started with) then the protocol can tax a certain percentage of the profit (eg, 5% of the profit goes to the treasury). 
 
 Ideally, the tax will be as large as possible for the protocol to earn the most profit, while not so large that the searchers stop executing the arbitrage txs. For example, if the searchers will only execute their arbitrage strategy if they earn at least <span>$</span>1K per month due to energy/server fees, then the protocol should adjust their tax rate so that the searchers earn approx <span>$</span>100 per month. For example, if there is <span>$</span>100K of PEV per month on the protocol and the protocol notices 10 searchers are arbitraging, then they could set the tax rate to (100,000 - 10 * 100) / 100,000 = 99% (lol) and earn 99K in additional profit for their dao/users.  
 
 ## User Experience: More Value More Wait 
 
-While recording and ordering txs in the code allows for protocols to extract additional value, one problem is that users need to wait longer for their transactions to confirm because not only does their tx need to be put in a chain-level block (which requires N txs), but also a protocol-level block (which requires N protocol txs). This is a trade-off that the protocol will need to decide if its worth it or not.
+While recording and ordering txs in the code allows for protocols to extract additional value, this also requires users to wait longer for their transactions to be confirmed. Not only do the users need their tx to be put in a chain-level block but they also need to wait for a protocol-level block (which requires N protocol-level txs). This introduces an interesting parameter of how many txs to include in a protocol-level block: the more txs included in each block should lead to more value extraction opportunities however this may also lead to longer wait times for the user. 
 
 ## What's Happening Now 
 
