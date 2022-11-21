@@ -136,6 +136,10 @@ the amm's per_lp values. This allows for the lp position to settle their positiv
 
 ### fin
 
+
+### other links
+- more info on drift-v2 can be found here: https://docs.drift.trade/liquidity-providers-lps
+
 ### Bonus: LP Script for the DAMM
 
 Alpha: If you're interested in adding liquidity to Drift's perp market and leveraging the power of the DAMM for your trading you can use
