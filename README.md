@@ -1,6 +1,6 @@
 # blog.md
 
-- [Implementing Liquidity Providing: Uniswap-v2 and Drift-v2](https://github.com/0xNineteen/blog.md/blob/master/lps-v2/index.md): Implementation overview of liquidity providers for Uniswap-v2 and Drift-v2. 
+- [LPs for Token and Perp AMMs: Uniswap-v2 and Drift-v2](https://github.com/0xNineteen/blog.md/blob/master/lps-v2/index.md): Implementation overview of liquidity providers for Uniswap-v2 and Drift-v2. 
 
 - [Consensus 101: The Dolev-Strong Protocol](https://github.com/0xNineteen/blog.md/blob/master/blockchain-01/dolev.ipynb): Python implementation of the Dolev-Strong Protocol which works even with 99% evil nodes.  
 
