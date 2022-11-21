@@ -25,7 +25,7 @@ results in minting new lp tokens, giving them to the user, and tracking the tota
 
 For example, if the reserves are x, y = 100, 100 with 100 lp tokens minted in total and an lp adds x', y' = 50, 50
 then 50 lp tokens are minted as the user is providing (x' / (x + x') = 50/(100 + 50) = 33%) of the liquidity to the pool. The reserves are then
-updated to be x, y = 150, 150, k is updated to be 150 * 150, and 150 lp tokens minted in total is tracked. 
+updated to be x, y = 150, 150, k is updated to be 150 * 150, 50 lp tokens are minted to the user and now the total number of lp tokens is 150.
 
 When a user removes liquidity/burns lp tokens they get the reserve amounts relative to how many lp tokens 
 they're burning and the total number of lp tokens minted. 
