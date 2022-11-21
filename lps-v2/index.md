@@ -1,5 +1,5 @@
 
-# Implementing Liquidity Providing: Uniswap and Drift-v2
+# LPs for Token and Perp AMMs: Uniswap and Drift-v2
 
 <div align="center">
 <img src="2022-11-21-10-40-52.png" width="450" height="300">
