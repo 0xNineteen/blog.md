@@ -20,7 +20,7 @@ you can check out [this repo](https://github.com/0xNineteen/anchor-uniswap-v2).
 
 When a user adds liquidity/mints lp tokens to the pool they first define how much of asset X and Y to deposit: x' and y'. Depositing 
 x' and y' amounts leads to new reserve values (x + x'), (y + y') and an increased k value. This 
-increased value of k leads to less slippage for the user. This also 
+increased value of k leads to less slippage for other traders. This also 
 results in minting new lp tokens, giving them to the user, and tracking the total number of lp tokens minted. 
 
 For example, if the reserves are x, y = 100, 100 with 100 lp tokens minted in total and an lp adds x', y' = 50, 50
@@ -78,17 +78,8 @@ then the amm.base_per_lp += 1 (100 base / 100 lp tokens) and amm.quote_per_lp +=
 Note: the amm gets a slice of the opposite side of the trade too (since sqrt_k is its number of lp tokens). 
 
 ```rust 
-let per_lp_delta_base = get_proportion_i128(
-    delta.base_asset_amount.cast()?,
-    AMM_RESERVE_PRECISION,
-    market.amm.sqrt_k,
-)?;
-
-let per_lp_delta_quote = get_proportion_i128(
-    delta.quote_asset_amount.cast()?,
-    AMM_RESERVE_PRECISION,
-    market.amm.sqrt_k,
-)?;
+let per_lp_delta_base = delta.base_asset_amount / market.amm.sqrt_k;
+let per_lp_delta_quote = delta.quote_asset_amount / market.amm.sqrt_k;
 
 market.amm.base_asset_amount_per_lp = market
     .amm
@@ -102,6 +93,8 @@ market.amm.quote_asset_amount_per_lp = market
 ```
 [ref](https://github.com/drift-labs/protocol-v2/blob/2e44f98f6e49e1325bdc80d129037aeab2891e41/programs/drift/src/controller/position.rs#L372)
 
+Notice how the fees are directly incorporated into the quote_asset_amount of the position (ie, the cost basis of the position) so the LP will likely be short at the top or long at the bottom.
+
 An interesting fact is that because the number of lp tokens minted increases sqrt_k through addition, users take on positions 
 proportional to how much liquidity they provide to the AMM. This also means that when we initialize an AMM with sqrt_k, we are also deciding 
 how many lp tokens to give to the AMM. 
@@ -109,7 +102,7 @@ how many lp tokens to give to the AMM.
 ### Removing Liquidity 
 
 When an LP burns its lp tokens, we take the difference between the amm's current per_lp values and their .last_ values, multiplied by 
-the number of lp tokens to decide how big of a position to give them. Notice how the fees are directly incorporated into the quote_asset_amount of the position (ie, the cost basis of the position) so the LP will likely be short at the top or long at the bottom. 
+the number of lp tokens to decide how big of a position to give them. 
 
 ```rust 
 // calculate base to give
