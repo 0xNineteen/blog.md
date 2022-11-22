@@ -19,7 +19,7 @@ you can check out [this repo](https://github.com/0xNineteen/anchor-uniswap-v2).
 ### Adding + Removing Liquidity 
 
 When a user adds liquidity/mints lp tokens to the pool they first define how much of asset X and Y to deposit: x' and y'. Depositing 
-x' and y' amounts leads to new reserve values (x + x'), (y + y') and an increased k value. This 
+x' and y' amounts leads to new reserve values (x + x'), (y + y') and an increased k value ((x + x') * (y + y')). This 
 increased value of k leads to less slippage for other traders. This also 
 results in minting new lp tokens, giving them to the user, and tracking the total number of lp tokens minted. 
 
@@ -39,7 +39,7 @@ the reserves are decreased to x,y = 100, 100, k is decreased, and total lp token
 
 How do LPs earn fees? Say the fee percentage is 1% and a user swaps 100 of X for some token Y. Then the swap is performed with 99 X tokens
 and the 1 token X remains in the reserves; the reserves will be equal to x, y = 101, 100 before the swap of 99 X tokens.
-When the LPs burn their tokens they will receive a larger amount from when they minted because of the increase in reserves.
+If another user swaps 100 of Y for some X then the new reserves will be 101, 101 and so when the LPs burn their tokens they will receive a larger amount of reserves from when they minted, earning fees.
 
 ## Drift-v2's Perpetual-Future DAMM LPs 
 
@@ -60,8 +60,8 @@ We then track the AMM's values of amm.base_amount_per_lp and amm.quote_amount_pe
 
 ```rust 
 // track amm's metrics
-position.last_net_base_asset_amount_per_lp = amm.base_asset_amount_per_lp.cast()?;
-position.last_net_quote_asset_amount_per_lp = amm.quote_asset_amount_per_lp.cast()?;
+position.last_base_asset_amount_per_lp = amm.base_asset_amount_per_lp.cast()?;
+position.last_quote_asset_amount_per_lp = amm.quote_asset_amount_per_lp.cast()?;
 
 // ... 
 
@@ -71,11 +71,11 @@ let update_k_result = get_update_k_result(market, new_sqrt_k_u192, true)?;
 update_k(market, &update_k_result)?;
 ```
 
-As traders trade against the amm, amm's per_lp variables change to take on the opposite side of the trade. For example, 
+As traders trade against the amm, the amm's per_lp variables change to take on the opposite side of the trade. 
+
+For example, 
 if a user goes long 100 SOL for 100 usdc (+100 base, -100 quote) and there's one lp with 100 lp tokens (ignoring the AMM), 
 then the amm.base_per_lp += 1 (100 base / 100 lp tokens) and amm.quote_per_lp += -1 (-100 quote / 100 lp tokens) + slice of fee paid.
-
-Note: the amm gets a slice of the opposite side of the trade too (since sqrt_k is its number of lp tokens). 
 
 ```rust 
 let per_lp_delta_base = delta.base_asset_amount / market.amm.sqrt_k;
@@ -93,7 +93,9 @@ market.amm.quote_asset_amount_per_lp = market
 ```
 [ref](https://github.com/drift-labs/protocol-v2/blob/2e44f98f6e49e1325bdc80d129037aeab2891e41/programs/drift/src/controller/position.rs#L372)
 
-Notice how the fees are directly incorporated into the quote_asset_amount of the position (ie, the cost basis of the position) so the LP will likely be short at the top or long at the bottom.
+*Note:* the amm also gets a slice of the opposite side of the trade too since we divide by sqrt_k.
+
+Also notice how the fees are directly incorporated into the quote_asset_amount of the position (ie, the cost basis of the position) so the LP will likely be short at the top or long at the bottom when they recieve their position.
 
 An interesting fact is that because the number of lp tokens minted increases sqrt_k through addition, users take on positions 
 proportional to how much liquidity they provide to the AMM. This also means that when we initialize an AMM with sqrt_k, we are also deciding 
@@ -132,7 +134,7 @@ Ok((base_asset_amount, quote_asset_amount))
 ### Settling LPs
 
 We also have another operation called Settle_LP which gives the lp an actual position and updates their .last_ variables to be equal to 
-the amm's per_lp values. This allows for the lp position to settle their positive/negative PnL like a normal position.
+the amm's per_lp values. This allows for the lp position to settle their positive/negative PnL like a normal position (along with everything else a normal perp market position can do).
 
 ### fin
 
