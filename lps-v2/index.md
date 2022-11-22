@@ -151,8 +151,9 @@ the python script below [here](https://github.com/drift-labs/driftpy/blob/master
 python start_lp.py 
 --keypath ./x19.json # keypair path
 --env mainnet 
---amount 30  # 30 lp tokens
---market 0 # SOL index
+--amount 19 # number of lp tokens to mint
+--market 0 # SOL market
+--operation add
 ```
 
 <!-- 
