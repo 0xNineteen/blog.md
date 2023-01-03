@@ -2,7 +2,7 @@
 
 - [Random Gists](https://gist.github.com/0xNineteen): Rando code snippets 
 
-- [Random Thoughts: Zero Knowledge to BulletProofs](https://github.com/0xNineteen/blog.md/blob/master/reflecting-0k2bp/index.md): Random thoughts of mine while learning how bulletproofs work.
+- [Random Thoughts: Zero Knowledge to BulletProofs](https://github.com/0xNineteen/blog.md/blob/master/reflecting-0k2bp/index.md): Random thoughts of mine while learning how bulletproofs/vector-commitments/range-proofs/ring-sigs work.
 
 - [LPs for Token and Perp AMMs: Uniswap-v2 and Drift-v2](https://github.com/0xNineteen/blog.md/blob/master/lps-v2/index.md): Implementation overview of liquidity providers for Uniswap-v2 and Drift-v2. 
 
