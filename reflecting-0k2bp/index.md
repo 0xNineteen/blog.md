@@ -1,6 +1,6 @@
 # Random Thoughts: Zero Knowledge to BulletProofs 
 
-This will contain random thoughts on [this text](from0k2bp.pdf). 
+Apparently the best way to learn is to 1) learn 2) reflect 3) wait. So these notes will be 2) for me, and will contain random and v rough thoughts on [this text](from0k2bp.pdf). 
 
 ## ZK commitments on a set of vectors 
 
