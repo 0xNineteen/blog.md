@@ -1,5 +1,9 @@
 # Zero-fee, Zero-slippage, Revenue Generating, Perps Dex
 
+tldr; to implement a perps dex you periodically settling all trader's pnl into a pnl pool (positive pnl removes $ from the pool, negative pnl adds $ to the pool). In order for a zero-fee, zero-slippage perps dex to generate revenue it can periodically take a slice of the pnl in that pool.
+
+---
+
 Defi dexs have evolved over time from CLOBs/AMMs (serum/uniswap) to perp CLOBs/AMMs (mango/drift) to oracle-based zero-slippage perps (GMX) and other crazy ideas. Defi allows wild ideas to flourish since anyone can deploy a contract and anyone can trade through that contract to win/lose money. While zero-slippage is in a land of its own, this post will talk about something even more insane - how we can achieve a zero-slippage AND zero-fee perp dex that still earns money.
 
 <div align="center">
