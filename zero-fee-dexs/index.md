@@ -8,7 +8,7 @@ tldr; to implement a perps dex you periodically settling all trader's pnl into a
 <img src="2023-01-10-18-58-40.png" width="450" height="350">
 </div>
 
-Defi dexs have evolved over time from CLOBs/AMMs (serum/uniswap) to perp CLOBs/AMMs (mango/drift) to oracle-based zero-slippage perps (GMX) and other crazy ideas. Defi allows wild ideas to flourish since anyone can deploy a contract and anyone can trade through that contract to win/lose money. While zero-slippage is in a land of its own, this post will talk about something even more insane - how we can achieve a zero-slippage AND zero-fee perp dex that still earns money.
+Defi dexs have evolved over time from CLOBs/AMMs (serum/uniswap) to perp CLOBs/AMMs (mango/drift) to oracle-based zero-slippage perps (GMX) and other crazy ideas. Defi allows wild ideas to flourish since anyone can deploy a contract and anyone can trade through that contract to win/lose money. This post will talk about an insane dex idea i thought of while trying to fall asleep - how we can achieve a zero-slippage AND zero-fee perp dex that still earns money.
 
 ## settling pnl & pnl pools
 
