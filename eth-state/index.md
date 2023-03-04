@@ -1,27 +1,29 @@
-# managing blockchain state: deriving eth's impl
+# Storing Data on the Blockchain: ETH
 
-one of the most important things is how to manage state on the blockchain 
+<div align="center">
+<img src="2023-03-04-13-03-12.png" width="300" height="350">
+</div>
 
-while there are a lot of posts on how eth does it/the state-trie, in this
-post well approach the problem by starting from a simple implementation and then 
-optimizing it to arrive at eth's state - deriving chain state implementations 
+one of the most important things in a blockchain is how to state is managed. it must be extremely memory and computationally efficient to scale to millions of accounts.
 
-first we should define a few structures well need 
+while there are a lot of posts on how eth does it, since the final solution is the product of many optimizations - i feel like the best way to understand it is by starting from a simple implementation and then 
+optimizing it to eventually arrive at the final solution - which is exactly what we'll do in this post. 
+
+the main structures well work with include:
 - a user's account: well use a simple model of (user public key address => eth amount)
 - a transaction: which will adjust a users account amount 
 - a block: which references ... 
   - the parent's block hash (building the chain)
   - the state of the chain at that block (state root hash)
 
-the main thing we want to be able to do is get the state at each block - or 
-more specifically get the state of any users account at any point in time. 
+the main thing we want to be able to do is get the state at each block.
 
 why do we need it at any point in time instead of just the most recent block? 
 well, it will be useful for when we have forks which build off a block which isnt the head
 
-ie, well need to get the previous blocks state, apply the transactions and continue to build 
+ie, well need to get the previous blocks state, apply the transactions and continue to build the chain
 
-*note:* full code/implementations can be found in the folder
+*note:* full python code/implementations can be found in the folder
 
 # simplest impl: clone everything (v1)
 
@@ -223,6 +225,12 @@ the key to processing a transaction is to:
         block = Block(parent_block.block_hash, state_root, tx_root)
         self.chain.append(block)
 ```
+
+for example, changing `0xabc`'s account from `1eth` to `2eth` would be the following: 
+
+![](2023-03-04-13-12-25.png)
+
+notice how we remove the old hash (`0xeee`), append the new hash, and insert the new account into the db. 
 
 # optimize optimize: tree structures and Log(N) (v3)
 
