@@ -4,37 +4,36 @@
 <img src="2023-03-04-13-03-12.png" width="300" height="350">
 </div>
 
-one of the most important things in a blockchain is how to state is managed. it must be extremely memory and computationally efficient to scale to millions of accounts.
+one of the most important things in a blockchain is how to manage state: it must be extremely memory and computationally efficient to scale to millions of accounts.
 
-while there are a lot of posts on how eth does it, since the final solution is the product of many optimizations - i feel like the best way to understand it is by starting from a simple implementation and then 
+while there are a lot of posts on how eth does it, the final solution is the product of many optimizations: i feel like the best way to understand it is by starting from a simple implementation and 
 optimizing it to eventually arrive at the final solution - which is exactly what we'll do in this post. 
 
-the main structures well work with include:
-- a user's account: well use a simple model of (user public key address => eth amount)
-- a transaction: which will adjust a users account amount 
+the main structures we'll use include:
+- a user's account: well use a simple model of (user public key address => eth balance/amount)
+- a transaction: which will increment/decrement a user's balance
 - a block: which references ... 
   - the parent's block hash (building the chain)
   - the state of the chain at that block (state root hash)
 
-the main thing we want to be able to do is get the state at each block.
+the main thing we want to be able to do is to get the global account state of any block.
 
-why do we need it at any point in time instead of just the most recent block? 
-well, it will be useful for when we have forks which build off a block which isnt the head
+why do we need it at any point in time instead of just the most recent block? well, it will be useful when we have forks which build off a block which isn't the head
 
-ie, well need to get the previous blocks state, apply the transactions and continue to build the chain
+ie, we'll need to get the previous block's state, apply the transactions, and continue to build the chain
 
-*note:* full python code/implementations can be found in the folder
+*note:* the full python code/impl can be found in the `blog.md/content/eth-state` folder
 
 # simplest impl: clone everything (v1)
 
 the simplest implementation (and very inefficient) we can start with is to have
-state be a dictionary which maps a users address => amount. each block will represent a hash of the state, which can be looked up in a database to get the serialized dictionary of state.
+the global state be a dictionary which maps a users address => eth balance. to do this, each block will include a hash of the state, which can be used to query a database to get the full state dictionary.
 
 ![](2023-03-04-12-03-35.png)
 
 to understand how it works well go through the cases of: 
   1) building the genesis block 
-  2) looking up state 
+  2) looking up accounts from a specific block
   3) processing a transaction
 
 ## 1) building genesis 
@@ -68,8 +67,8 @@ looking up user accounts is straightforward:
 ```python 
 def get_account(self, address): 
     head_block = self.chain[-1]
-    state_root = head_block.state_root
-    state = State.deserialize(self.db.get(state_root))
+    state_root = head_block.state_root # get the state hash 
+    state = State.deserialize(self.db.get(state_root)) # query the db
     return state.get(address) # state[address]
 ```
 
@@ -81,7 +80,7 @@ and store it again in the database.
 
 note: even though we only change a single account we clone all the accounts and re-store it
 in the database (very inefficient). similarily, we re-generate the entire merkle tree 
-even though a single leaf has been changed.  
+even though only a single leaf has been changed.  
 
 ```python 
 def process_tx(self, tx: Transaction): 
@@ -102,21 +101,24 @@ def process_tx(self, tx: Transaction):
 
 # optimizing memory: account references (v2)
 
-to reduce the amount of memory we are using/referencing we'll change the lookup to be `state_root => list[(account hash, address/public key)]`.  
+to reduce the amount of memory we are using we'll change the lookup to be `state_root => list[(account hash, address/public key)]` where the `account hash` can be used to query the database for the serialized account.
 
 ![](2023-03-04-12-11-54.png)
 
 this means for each block will clone `O(N)` account hashes instead of `O(N)` accounts data. notice how block3 and block2 both point to the same underlying data of account `0xeee`.
 
-we store the state as a list of tuples `(hash, address)` so we can find the hash of a specific address easily. eg, `0xeee = hash({"0xabc": 1eth})`
+*note:* we store the state as a list of tuples `(hash, address)` so we can find the hash of a specific address easily. eg, `0xeee = hash({"0xabc": 1eth})`
 
 ## 1) building genesis 
 
-the only differnce is the state is now a database and a list of account hashes: 
+the only difference is that state is now a database and a list of account hashes instead of a dictionary: 
 
 ```python 
 class State: 
     db = DB("state.db")
+
+    def __init__(self): 
+	self.account_hashes = []     
     
     def put_account(self, account: Account): 
         # store: account_hash => account
@@ -130,7 +132,7 @@ class State:
         return bytes(json.dumps(self.account_hashes), "utf-8")
 ```
 
-and then creating the genesis is the same: 
+and then creating the genesis block is the same: 
 
 ```python 
 class Blockchain(): 
@@ -142,10 +144,8 @@ class Blockchain():
         self.db = DB('blocks.db', resume=False)
         self.db.put(state_root, state.serialize())
 
-        # NOTE: this doesnt support forks 
         genesis = Block(bytes(0), state_root, bytes(0))
         self.chain: list[Block] = [genesis]
-
 ```
 
 ## 2) looking up state
@@ -160,11 +160,12 @@ def get_account(self, address) -> Account:
     state = State.deserialize(self.db.get(head.state_root))
     state_account_hashes = state.account_hashes
 
-    # find account
+    # find account hash using the address
     address_hash = [h for (h, addr) in state_account_hashes if addr == address]
     if len(address_hash) == 0: return None # DNE
     address_hash = address_hash[0]
 
+    # lookup the account hash in the db
     account = state.db.get(address_hash)
     account = Account.deserialize(account)
 
@@ -174,9 +175,8 @@ def get_account(self, address) -> Account:
 ## 3) processing a new transaction
 
 the key to processing a transaction is to: 
-  1) lookup previous account state
-  1) modify the account 
-  2) generate the new account hash 
+  1) lookup previous account state + find the account
+  1) modify the account + compute the new hash 
   3) modify the list of account hashes (to include the new account's hash)
   4) generate a new state root (from the new list of account hashes) 
   5) store the account + new state root in the db 
@@ -230,9 +230,9 @@ for example, changing `0xabc`'s account from `1eth` to `2eth` would be the follo
 
 ![](2023-03-04-13-12-25.png)
 
-notice how we remove the old hash (`0xeee`), append the new hash, and insert the new account into the db. 
+notice how we remove the old hash (`0xeee`) from the state hash list, append the new hash, and insert the new account into the db.
 
-# optimize optimize: tree structures and Log(N) (v3)
+# more optimizations: tree structures and log(N) updates (v3)
 
 v2's memory consumption is only O(N) hashes when updating an account, but we can do better! 
 
@@ -240,9 +240,13 @@ instead of using a list of N hashes, if we organize them using a tree (eth uses 
 
 since we are using the hex-value of the hashes we can have `b=16` for the possible hex values and instead of using `list[(hash, address)]` it will be a key-value tree of `tree((hash, address))`.
 
-we can improve the structure even more and get a merkle tree for free, if we make the hash reference the hash of its child! 
+we can improve the structure even more and get a merkle tree for free if we make the hash reference the hash of its child! 
 
-thats two datastructures in one and O(log(N)) clones on update and is essentially what eth's state trie is! 
+thats two data structures in one and O(log(N)) clones on update and is essentially what eth's state trie is! 
+
+
+![](ethblockchain.png)
+[ref](https://blog.ethereum.org/2015/06/26/state-tree-pruning)
 
 --- 
 
