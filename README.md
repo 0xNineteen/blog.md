@@ -1,6 +1,6 @@
 # blog.md
 
-- [Storing Data on the Blockchain: ETH](https://github.com/0xNineteen/blog.md/blob/master/contents/eth-state/index.md): talks about how to implement state storage on the blockchain, starting with the basics and iterative improvements, ultimately explaining how ETH does it. 
+- [Storing Data on the Blockchain: ETH](https://github.com/0xNineteen/blog.md/blob/master/contents/eth-state/index.md): talks about how to implement state storage on the blockchain, starting with the basics and iterative improvements, ultimately explaining how hyper optimized ETH does it. 
 
 - [Zero-fee, Zero-slippage, Revenue Generating, Perps Dex](https://github.com/0xNineteen/blog.md/blob/master/contents/zero-fee-dexs/index.md): talks about how we can build a zero-fee, zero-slippage, perps dex that still earns $$.
 
