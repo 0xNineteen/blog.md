@@ -244,6 +244,8 @@ we can improve the structure even more and get a merkle tree for free if we make
 
 thats two data structures in one and O(log(N)) clones on update and is essentially what eth's state trie is! 
 
+![](2023-03-05-10-37-30.png)
+[ref](https://arxiv.org/abs/2108.05513)
 
 ![](ethblockchain.png)
 [ref](https://blog.ethereum.org/2015/06/26/state-tree-pruning)
