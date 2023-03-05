@@ -78,10 +78,6 @@ when processing a new transaction we get the state, process the transaction to g
 a new state, re-generate the merkle tree of the new state (the hash of the state), 
 and store it again in the database. 
 
-note: even though we only change a single account we clone all the accounts and re-store it
-in the database (very inefficient). similarily, we re-generate the entire merkle tree 
-even though only a single leaf has been changed.  
-
 ```python 
 def process_tx(self, tx: Transaction): 
     parent_block = self.chain[-1]
@@ -98,6 +94,9 @@ def process_tx(self, tx: Transaction):
     block = Block(parent_block.block_hash, state_root)
     self.chain.append(block)
 ```
+note: even though we only change a single account we clone all the accounts and re-store it
+in the database (very inefficient). similarily, we re-generate the entire merkle tree 
+even though only a single leaf has been changed. 
 
 # optimizing memory: account references (v2)
 
@@ -105,17 +104,17 @@ to reduce the amount of memory we are using we'll change the lookup to be `state
 
 ![](2023-03-04-12-11-54.png)
 
-this means for each block will clone `O(N)` account hashes instead of `O(N)` accounts data. notice how block3 and block2 both point to the same underlying data of account `0xeee`.
+this optimization means each block will clone `O(N)` account hashes instead of `O(N)` account-datas, which is much more efficient. notice how block3 and block2 both point to the same underlying data of account `0xeee`.
 
-*note:* we store the state as a list of tuples `(hash, address)` so we can find the hash of a specific address easily. eg, `0xeee = hash({"0xabc": 1eth})`
+*note:* we store the state as a list of tuples `(hash, address)` so we can find the hash of a specific address easily. eg, `0xeee = hash({"0xabc": 1eth})`.
 
 ## 1) building genesis 
 
-the only difference is that state is now a database and a list of account hashes instead of a dictionary: 
+the only difference building the genesis block is that state is now a database and a list of account hashes instead of a dictionary: 
 
 ```python 
 class State: 
-    db = DB("state.db")
+    db = DB("state.db") # global db for all State instances
 
     def __init__(self): 
 	self.account_hashes = []     
@@ -129,6 +128,7 @@ class State:
         return hash([bytes(h, 'utf-8') for h, _ in self.account_hashes])
 
     def serialize(self): 
+    	# we use a simple json serialization (can be improved)
         return bytes(json.dumps(self.account_hashes), "utf-8")
 ```
 
@@ -144,7 +144,7 @@ class Blockchain():
         self.db = DB('blocks.db', resume=False)
         self.db.put(state_root, state.serialize())
 
-        genesis = Block(bytes(0), state_root, bytes(0))
+        genesis = Block(bytes(0), state_root)
         self.chain: list[Block] = [genesis]
 ```
 
@@ -156,7 +156,7 @@ getting state is simply getting the list of hashes and finding the address you w
 def get_account(self, address) -> Account: 
     head = self.chain[-1]
 
-    # lookup parent block's state
+    # lookup block's state
     state = State.deserialize(self.db.get(head.state_root))
     state_account_hashes = state.account_hashes
 
@@ -165,7 +165,7 @@ def get_account(self, address) -> Account:
     if len(address_hash) == 0: return None # DNE
     address_hash = address_hash[0]
 
-    # lookup the account hash in the db
+    # lookup the account hash in the state db
     account = state.db.get(address_hash)
     account = Account.deserialize(account)
 
@@ -209,20 +209,21 @@ the key to processing a transaction is to:
             # modify account with tx
             account = account.apply(tx)
 
-            # update state_account_hashes 
+            # remove old hash from state_account_hashes 
             del state_account_hashes[i]
 
         # put new account in db
         state.put_account(account)
+	# update list of hashes
+	state_account_hashes.append((account.hash(), tx.address))
 
         # update new state root
-        state_account_hashes.append((account.hash(), tx.address))
         new_state = State(state_account_hashes)
         state_root = new_state.generate_merkle_root()
         self.db.put(state_root, new_state.serialize())
 
         # create new block 
-        block = Block(parent_block.block_hash, state_root, tx_root)
+        block = Block(parent_block.block_hash, state_root)
         self.chain.append(block)
 ```
 
