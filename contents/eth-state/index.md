@@ -42,9 +42,6 @@ to generate the genesis block we create an empty dictionary and store a referenc
 from its hash (`state_root = hash({})`) to the serialized dictionary (`state.serialize()`) in the database (`db`). 
 we then create the genesis block which includes the hash to the state and add it to the chain.
 
-note: to generate the hash of the state well generate a merkle tree from the account hashes 
-(you could also just hash all the accounts together).
-
 ```python
 class Blockchain(): 
     def __init__(self) -> None:
@@ -59,6 +56,9 @@ class Blockchain():
         genesis = Block(bytes(0), state_root)
         self.chain = [genesis]
 ```
+
+note: to generate the hash of the state well generate a merkle tree from the account hashes 
+(you could also just hash all the accounts together).
 
 ## 2) looking up state
 
