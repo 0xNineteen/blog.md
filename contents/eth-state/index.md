@@ -237,7 +237,7 @@ notice how we remove the old hash (`0xeee`) from the state hash list, append the
 
 v2's memory consumption is only O(N) hashes when updating an account, but we can do better! 
 
-instead of using a list of N hashes, if we organize them using a tree (eth uses a radix tree) which utilizes pointers/branches, an update will only require $O(log_b(N))$ hash clones, where b is the branching factor of the tree. 
+instead of using a list of N hashes, if we organize them using a tree (eth uses a radix tree) which utilizes pointers/branches. with this datastructure, an update will only require $O(log_b(N))$ hash clones, where b is the branching factor of the tree. 
 
 since we are using the hex-value of the hashes we can have `b=16` for the possible hex values and instead of using `list[(hash, address)]` it will be a key-value tree of `tree((hash, address))`.
 
