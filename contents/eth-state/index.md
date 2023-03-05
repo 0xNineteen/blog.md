@@ -1,7 +1,7 @@
 # Storing Data on the Blockchain: ETH
 
 <div align="center">
-<img src="2023-03-04-13-03-12.png" width="300" height="350">
+<img src="2023-03-04-13-03-12.png" width="400" height="450">
 </div>
 
 one of the most important things in a blockchain is how to manage state: it must be extremely memory and computationally efficient to scale to millions of accounts.
