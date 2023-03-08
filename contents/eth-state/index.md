@@ -250,7 +250,3 @@ thats two data structures in one and O(log(N)) clones on update and is essential
 
 ![](ethblockchain.png)
 [ref](https://blog.ethereum.org/2015/06/26/state-tree-pruning)
-
---- 
-
-fin
