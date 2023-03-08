@@ -116,8 +116,8 @@ the only difference building the genesis block is that state is now a database a
 class State: 
     db = DB("state.db") # global db for all State instances
 
-    def __init__(self): 
-	self.account_hashes = []     
+    def __init__(self, account_hashes=[]): 
+	self.account_hashes = account_hashes
     
     def put_account(self, account: Account): 
         # store: account_hash => account
