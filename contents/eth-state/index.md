@@ -1,4 +1,4 @@
-# Storing Data on the Blockchain: ETH
+# ETH State Managment
 
 <div align="center">
 <img src="2023-03-04-13-03-12.png" width="400" height="450">
