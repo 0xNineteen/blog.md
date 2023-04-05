@@ -4,10 +4,6 @@
 
 - [Zero-fee, Zero-slippage, Revenue Generating, Perps Dex](https://github.com/0xNineteen/blog.md/blob/master/contents/zero-fee-dexs/index.md): talks about how we can build a zero-fee, zero-slippage, perps dex that still earns $$.
 
-- [Random Gists](https://gist.github.com/0xNineteen): rando code snippets 
-
-- [Random Thoughts: Zero Knowledge to BulletProofs](https://github.com/0xNineteen/blog.md/blob/master/contents/reflecting-0k2bp/index.md): random thoughts of mine while learning how bulletproofs/vector-commitments/range-proofs/ring-sigs work.
-
 - [LPs for Token and Perp AMMs: Uniswap-v2 and Drift-v2](https://github.com/0xNineteen/blog.md/blob/master/contents/lps-v2/index.md): Implementation overview of liquidity providers for Uniswap-v2 and Drift-v2. 
 
 - [Consensus 101: The Dolev-Strong Protocol](https://github.com/0xNineteen/blog.md/blob/master/contents/blockchain-01/dolev.ipynb): Python implementation of the Dolev-Strong Protocol which works even with 99% evil nodes.  
@@ -27,3 +23,9 @@
 - [Rust Macros and Arbitrage Bots on Solana](https://github.com/0xNineteen/blog.md/blob/master/contents/rust-macros-arbitrage/index.md): Practical example of how to use rust macros. The example includes writing an arbitrage bot for Solana.
 
 - [A New Perspective on BTC's POW](https://github.com/0xNineteen/blog.md/blob/master/contents/btc-consensus/index.md): Short post on how BTC's POW is a decentralized clock which doesn't require any coordination/agreement on time.
+
+--- 
+
+- [Random Gists](https://gist.github.com/0xNineteen): rando code snippets 
+
+- [Random Thoughts: Zero Knowledge to BulletProofs](https://github.com/0xNineteen/blog.md/blob/master/contents/reflecting-0k2bp/index.md): random thoughts of mine while learning how bulletproofs/vector-commitments/range-proofs/ring-sigs work.
