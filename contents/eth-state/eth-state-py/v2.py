@@ -11,7 +11,6 @@ class Block:
     def __post_init__(self):
         self.block_hash = hash([self.parent_hash, self.tx_root, self.state_root])
 
-
 class State:
     db = DB("state.db")
 

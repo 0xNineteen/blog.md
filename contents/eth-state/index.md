@@ -244,6 +244,8 @@ we can improve the structure even more and get a merkle tree for free if we make
 
 thats two data structures in one and O(log(N)) clones on update and is essentially what eth's state trie is! 
 
+For a full implementation of the radix tree checkout the python code in `blog.md/content/eth-state/more_trees/patricia_merkle.py` file.
+
 ![](2023-03-05-10-37-30.png)
 [ref](https://arxiv.org/abs/2108.05513)
 

@@ -1,0 +1,6 @@
+- trie: single characters in a tree 
+- radix: trie + includes shortcuts 
+- merkle-tree: ... not included ... (but is next logical step)
+- patricia-merkle: base-16 radix merkle tree
+  - uses a database and stores the hashes in the tree
+  - searching for addresses involves traversing the tree - whos value is the hash of the account 
