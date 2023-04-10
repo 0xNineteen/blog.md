@@ -128,6 +128,8 @@ assert account.address == 'abcde'
 assert account.amount == 22
 print(account)
 
+print("state0 size:", len(db))
+
 # new block
 account = Account(25, 'abcde')
 digest = account.digest16()
@@ -137,6 +139,10 @@ db[digest] = account.serialize()
 # OPTIM: can optimize the commit process to only commit the log(N) updates on insert
 state_root = TREE.commit(db) 
 block1 = Block(state_root)
+
+# db size goes from 7 => 11 
+# need 1) new state_root 2) new child digest ('abc') 3) new account digest ('abcdef')
+print("state1 size:", len(db)) 
 
 # new data
 account = get_account('abcde', block1.state_root, db)
