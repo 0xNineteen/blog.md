@@ -12,7 +12,7 @@ utilizing these two solutions correctly can improve your tx sending/confirming p
 
 ## sending a transaction
 
-First, we need to understand how a transaction (tx) is sent on Solana. Note there are many resources available on the topic (see references section), however, I'll provide a brief overview with a focus on diving into the validator code to provide more depth.
+first, we need to understand how a transaction (tx) is sent on solana. Note there are many resources available on the topic (see references section), however, I'll provide a brief overview with a focus on diving into the validator code to provide more depth
 
 typically, when you send a transaction to the network the flow is:
 - your client code (Python or UI/JavaScript) sends the transaction to a full node's RPC (Remote Procedure Call). 
@@ -113,7 +113,7 @@ impl LeaderSchedule {
 
 ## code: sending a transaction
 
-to process txs, the validator initiates a new `JsonRpcService` (using `JsonRpcService::new()`) which initializes both a `JsonRpcRequestProcessor` and a `SendTransactionService`. 
+to process txs, the validator initiates a new `JsonRpcService` which initializes a `JsonRpcRequestProcessor` and a `SendTransactionService`. 
 
 the **`JsonRpcRequestProcessor` service runs an http server** to receive all the RPC requests. when a `send_transaction` RPC request is received, it sends the transaction to the `SendTransactionService` using the `meta.transaction_sender` channel. 
 
@@ -123,12 +123,12 @@ the **`SendTransactionService` service loops through receiving new transactions 
 
 # when RPCs stop working
 
-One problem is if the RPC you rely on crashes or stops working (due to hardware failures, too many requests, etc) and you arent able to send txs to the leader anymore.
+one problem is if the RPC you rely on crashes or stops working (due to hardware failures, too many requests, etc) and you arent able to send txs to the leader anymore.
 
 ## rpc load-balancing: extrnode
 
-One possible solution is to **maintain a list of RPCs and when one fails, you switch RPCs and query 
-ones that are still alive**. While this approach seems straightforward, it can be 
+one possible solution is to **maintain a list of RPCs and when one fails, you switch RPCs and query 
+ones that are still alive**. while this approach seems straightforward, it can be 
 costly to implement, involving managing multiple RPC links, implementing health checks, and 
 writing code to switch between RPCs in case of failure. 
 
@@ -163,9 +163,9 @@ Another solution is to avoid the jump from client => RPC altogether by **sending
 ![](2023-05-08-11-41-29.png)
 
 this would require constructing the leader schedule **locally** to know which node to forward your 
-transaction to. while currently, this would require running a full node (with large hardware 
-requirements - not suitable for running locally), mango is working on a solution called 
-'lite-rpc'. better yet, its also open source and being built out now: [https://github.com/blockworks-foundation/lite-rpc](https://github.com/blockworks-foundation/lite-rpc)!
+transaction to. currently, this would require running a full node (with large hardware 
+requirements - not suitable for running locally), but mango is working on a solution called 
+'lite-rpc'. better yet, its also open source: [https://github.com/blockworks-foundation/lite-rpc](https://github.com/blockworks-foundation/lite-rpc)
 
 
 # references 
