@@ -7,11 +7,10 @@ this post will be about recent rpc developments which i think are particularly c
 utilizing these two solutions correctly can improve your tx sending/confirming process by a lot. to understand how these two solutions are interesting, well also learn a bit about how txs included in blocks in solana and dive into validator code.
 
 ## sending a transaction
-****
 
-First, we need to understand how a transaction (tx) is sent in Solana. Note there are many resources available on the topic, however, I'll provide a brief overview with a focus on diving into the validator code to provide more depth.
+First, we need to understand how a transaction (tx) is sent on Solana. Note there are many resources available on the topic (see references section), however, I'll provide a brief overview with a focus on diving into the validator code to provide more depth.
 
-Typically, when you send a transaction to the network the flow is:
+typically, when you send a transaction to the network the flow is:
 - your client code (Python or UI/JavaScript) sends the transaction to a full node's RPC (Remote Procedure Call). 
   - This RPC could be something like 'mainnet-beta.solana.com'. 
 - the RPC, being aware of the next leader or block producer node, directly forwards the transaction to that leader. 
@@ -20,15 +19,14 @@ Typically, when you send a transaction to the network the flow is:
 ![](2023-05-08-11-00-03.png)
 
 ## the leader schedule
-****
 
-the RPC can determine which leader to send the tx to by using a leader schedule derived form the current state of the chain. 
+the RPC can determine which leader to send the tx to by using a leader schedule derived from the list of staked validators and the current epoch. 
 
-a leader schedule lasts for one 'epoch' amount of time (~2 days for Solana). this epoch is further divided into slots each lasting around 400 milliseconds, and each slot is assigned a specific leader to produce a block for that slot. 
+a leader schedule lasts for one 'epoch' amount of time (~2 days for Solana). this epoch is further divided into slots each lasting around 400 milliseconds, where each slot is assigned a specific leader to produce a block for that slot. 
 
 ![](2023-05-08-11-08-58.png)
 
-Accessing this information in real time from any RPC is easy to do.
+accessing this information in real time from any RPC is easy to do:
 
 ```python 
 from solana.rpc.api import Client
@@ -44,9 +42,8 @@ print(client.get_leader_schedule())
 ```
 
 ## code: constructing the leader schedule 
-****
 
-we can also dive into the validator code base to see how the leader schedule is constructed (the code is fully explained in the comments):
+we can also dive into the validator code base and see exactly how the leader schedule is constructed (code is fully explained in the comments):
 
 ```rust 
 // src: `ledger/src/leader_schedule_utils.rs`
@@ -81,6 +78,7 @@ pub fn leader_schedule(epoch: Epoch, bank: &Bank) -> Option<LeaderSchedule> {
 impl LeaderSchedule {
     pub fn new(
       ids_and_stakes: &[(Pubkey, u64)], // staked SOL amount for the nodes
+      // note: each node is identified by its unique publickey
       seed: [u8; 32], // random seed
       len: u64,  // number of slots 
       repeat: u64 // keep the same leader for `repeat` number of slots
@@ -110,32 +108,20 @@ impl LeaderSchedule {
 ```
 
 ## code: sending a transaction
-*****
 
-<!-- - validator starts a new `let json_rpc_service = JsonRpcService::new(`
-- this initializes `JsonRpcRequestProcessor` struct to process txs from the rpc 
-- when recieving a rpc request it processes it using the function `_send_transaction`
-  - which sends it to `SendTransactionService` `meta.transaction_sender.send(transaction_info)`
-  - calls on `receive_txn_thread` which recives txs 
-    - checks for retry txs 
-    - calls `send_transactions_in_batch`
-    - gets leaders TPU addresses: `get_tpu_addresses` (leader schedule is stored in `ClusterTpuInfo` using `PoH` `LeaderScheduleCache`)
-    - sends txs to the leader `send_transactions` -->
+to process txs, the validator initiates a new `JsonRpcService` (using `JsonRpcService::new()`) which initializes both a `JsonRpcRequestProcessor` and a `SendTransactionService`. 
 
-to process txs the validator initiates a new `JsonRpcService` (using `JsonRpcService::new()`) which initializes both a `JsonRpcRequestProcessor` and a `SendTransactionService`. 
+the **`JsonRpcRequestProcessor` service runs an http server** to receive all the RPC requests. when a `send_transaction` RPC request is received, it sends the transaction to the `SendTransactionService` using the `meta.transaction_sender` channel. 
 
-**`JsonRpcRequestProcessor` service runs an http server** and receives all the RPC requests. when a `send_transaction` RPC request is received, it sends the transaction to the `SendTransactionService` using the `meta.transaction_sender` channel. 
-
-the **`SendTransactionService` service loops through receiving transactions through the channel and sending transactions to the upstream leaders** (based on the leader schedule). This includes calling `get_tpu_addresses` to get the upcoming leader's TPU addresses and `send_transactions_in_batch` which sends the transactions to the leader's TPUs.
+the **`SendTransactionService` service loops through receiving new transactions and sending them upstream to upcoming leaders** (based on the leader schedule). This includes calling `get_tpu_addresses` to get the upcoming leader's TPU address and `send_transactions_in_batch` which sends the transactions to the leader's TPU.
 
 ![](2023-05-08-11-18-25.png)
 
 # when RPCs stop working
 
-One problem is if the RPC you rely on crashes or stops working (due to hardware failures, too many requests, etc) and you arent able to send txs anymore.
+One problem is if the RPC you rely on crashes or stops working (due to hardware failures, too many requests, etc) and you arent able to send txs to the leader anymore.
 
 ## rpc load-balancing: extrnode
-****
 
 One possible solution is to **maintain a list of RPCs and when one fails, you switch RPCs and query 
 ones that are still alive**. While this approach seems straightforward, it can be 
@@ -143,48 +129,43 @@ costly to implement, involving managing multiple RPC links, implementing health 
 writing code to switch between RPCs in case of failure. 
 
 however, theres good news, the extrnode project has implemented exactly this as a independent service that can be run locally. even better, the code is open source and available on github 
-at [https://github.com/extrnode](https://github.com/extrnode). You can even find a list of hundreds of available RPC endpoints there. 
+at [https://github.com/extrnode](https://github.com/extrnode). You can even find a list of hundreds of available RPC endpoints on their github. 
 
 ![](2023-05-08-11-33-54.png)
-
-<!-- 
-- one solution is to **maintain a large list of RPCs and query other RPCs that are working**
-- while this is straightforward it can be expensive to implement
-  - bc it requires having multiple RPC links, implementing health checks, and writing code to switch between the RPCs on failure
-- to solve this, extrnode (a grizzlython project), is working on a free rpc load-balancing solution which automatically tracks **all** of the networks nodes 
-- the code is open source [https://github.com/extrnode](https://github.com/extrnode) and even includes a list of available PRC endpoints -->
 
 ## how it works
 
 its also interesting to understand how they implemented this:
 - they first connect to a single full node RPC
-  - then using the [`getClusterNodes` API call](https://docs.solana.com/api/http#getclusternodes), it queries the node to receive a list of all other nodes it knowns through the gossip protocol
+  - then using the [`getClusterNodes` API call](https://docs.solana.com/api/http#getclusternodes), it queries the node to receive a list of all other nodes that node knowns through the gossip protocol
 - repeating this RPC call against all the new nodes, they can get the IP addresses of all the validator nodes on the network 
 - from this, they have a list of nodes which they can load-balance RPC requests between
 
 ## other utilizations
 
 other than load-balancing RPCs on failure, there are many other cool things you could do with this: 
-- improve the speed of requesting multiple blocks by splitting your queries between nodes (avoid spamming a single RPC)
-- subscribe/send txs to nodes which are physically closer to you, receiving the results faster
-- verify txs status' across many different nodes for extra confirmation
+- improve the speed of requesting blocks/information by splitting your queries between nodes (avoid spamming a single RPC)
+- subscribe/send requests to nodes which are physically closer to you to reduce request latency
+- verify tx status' across many different nodes for extra confirmation
 - ... and likely much more
 
 
 ## direct tx forwarding: mango's lite-rpc
-****
 
 Another solution is to avoid the jump from client => RPC altogether by **sending it directly to the leader**.
+
+![](2023-05-08-11-41-29.png)
 
 this would require constructing the leader schedule locally to know which node to forward your 
 transaction to. while currently, this would require running a full node (with large hardware 
 requirements - not suitable for running locally), mango is working on a solution called 
 'lite-rpc'. better yet, its also open source and being built out now: [https://github.com/blockworks-foundation/lite-rpc](https://github.com/blockworks-foundation/lite-rpc)!
 
-![](2023-05-08-11-41-29.png)
-
 
 # references 
 - [https://github.com/blockworks-foundation/lite-rpc](https://github.com/blockworks-foundation/lite-rpc)
 - [https://github.com/extrnode](https://github.com/extrnode)
 - [https://jito-labs.medium.com/solana-validator-101-transaction-processing-90bcdc271143](https://jito-labs.medium.com/solana-validator-101-transaction-processing-90bcdc271143)
+- [https://docs.solana.com/cluster/leader-rotation](https://docs.solana.com/cluster/leader-rotation)
+- [https://medium.com/solana-labs/gulf-stream-solanas-mempool-less-transaction-forwarding-protocol-d342e72186ad]( https://medium.com/solana-labs/gulf-stream-solanas-mempool-less-transaction-forwarding-protocol-d342e72186ad)
+- [https://jstarry.notion.site/Transaction-confirmation-d5b8f4e09b9c4a70a1f263f82307d7ce](https://jstarry.notion.site/Transaction-confirmation-d5b8f4e09b9c4a70a1f263f82307d7ce)
