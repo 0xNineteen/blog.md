@@ -131,7 +131,9 @@ writing code to switch between RPCs in case of failure.
 however, theres good news, the extrnode project has implemented exactly this as a independent service that can be run locally. even better, the code is open source and available on github 
 at [https://github.com/extrnode](https://github.com/extrnode). You can even find a list of hundreds of available RPC endpoints on their github. 
 
-![](2023-05-08-11-33-54.png)
+<div align="center">
+<img src="2023-05-08-11-33-54.png" width="450" height="350">
+</div>
 
 ## how it works
 
