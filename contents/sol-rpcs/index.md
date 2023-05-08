@@ -6,6 +6,10 @@ this post will be about recent rpc developments which i think are particularly c
 
 utilizing these two solutions correctly can improve your tx sending/confirming process by a lot. to understand how these two solutions are interesting, well also learn a bit about how txs included in blocks in solana and dive into validator code.
 
+<div align="center">
+<img src="2023-05-08-12-11-19.png" width="550" height="250">
+</div>
+
 ## sending a transaction
 
 First, we need to understand how a transaction (tx) is sent on Solana. Note there are many resources available on the topic (see references section), however, I'll provide a brief overview with a focus on diving into the validator code to provide more depth.
@@ -158,7 +162,7 @@ Another solution is to avoid the jump from client => RPC altogether by **sending
 
 ![](2023-05-08-11-41-29.png)
 
-this would require constructing the leader schedule locally to know which node to forward your 
+this would require constructing the leader schedule **locally** to know which node to forward your 
 transaction to. while currently, this would require running a full node (with large hardware 
 requirements - not suitable for running locally), mango is working on a solution called 
 'lite-rpc'. better yet, its also open source and being built out now: [https://github.com/blockworks-foundation/lite-rpc](https://github.com/blockworks-foundation/lite-rpc)!
