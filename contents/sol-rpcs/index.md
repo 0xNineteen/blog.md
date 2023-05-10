@@ -115,11 +115,11 @@ impl LeaderSchedule {
 
 To process txs, the validator initiates a new `JsonRpcService` which initializes a `JsonRpcRequestProcessor` and a `SendTransactionService`. 
 
+![](2023-05-08-11-18-25.png)
+
 The **`JsonRpcRequestProcessor` service runs an HTTP server** to receive all the RPC requests. When a `send_transaction` RPC request is received, it sends the transaction to the `SendTransactionService` using the `meta.transaction_sender` channel. 
 
 The **`SendTransactionService` service loops through receiving new transactions and sending them upstream to upcoming leaders** (based on the leader schedule). This includes calling `get_tpu_addresses` to get the upcoming leader's TPU address and `send_transactions_in_batch` which sends the transactions to the leader's TPU.
-
-![](2023-05-08-11-18-25.png)
 
 # When RPCs stop working
 
