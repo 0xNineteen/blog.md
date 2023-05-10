@@ -1,20 +1,20 @@
 # Solana: Sending Transactions and Open-Source RPC Projects
 
-this post will be about recent rpc developments which i think are particularly cool within the solana ecosystem:
-  - extrnode which is a rpc loadbalancer
-  - mango's lite-rpc which forwards txs directly to leaders without requiring a full node 
+This post will be about recent RPC developments which I think are particularly cool within the Solana ecosystem:
+  - Extrnode which is a RPC load balancer
+  - Mango's lite-rpc which forwards txs directly to leaders without requiring a full node 
 
-utilizing these two solutions correctly can improve your tx sending/confirming process by a lot. to understand how these two solutions are interesting, well also learn a bit about how txs included in blocks in solana and dive into validator code.
+Utilizing these two solutions correctly can improve your tx sending/confirming process by a lot. To understand how these two solutions are interesting, we'll also learn a bit about how txs included in blocks in Solana and dive into validator code.
 
 <div align="center">
 <img src="2023-05-08-12-11-19.png" width="550" height="250">
 </div>
 
-## sending a transaction
+## Sending a transaction
 
-first, we need to understand how a transaction (tx) is sent on solana. Note there are many resources available on the topic (see references section), however, I'll provide a brief overview with a focus on diving into the validator code to provide more depth
+First, we need to understand how a transaction (tx) is sent on Solana. Note there are many resources available on the topic (see references section), so I'll provide a brief overview with a focus on diving into the validator code to provide more depth
 
-typically, when you send a transaction to the network the flow is:
+Typically, when you send a transaction to the network the flow is:
 - your client code (Python or UI/JavaScript) sends the transaction to a full node's RPC (Remote Procedure Call). 
   - This RPC could be something like 'mainnet-beta.solana.com'. 
 - the RPC, being aware of the next leader or block producer node, directly forwards the transaction to that leader. 
@@ -22,15 +22,15 @@ typically, when you send a transaction to the network the flow is:
 
 ![](2023-05-08-11-00-03.png)
 
-## the leader schedule
+## The leader schedule
 
-the RPC can determine which leader to send the tx to by using a leader schedule derived from the list of staked validators and the current epoch. 
+The RPC can determine which leader to send the tx to by using a leader schedule derived from the list of staked validators and the current epoch. 
 
-a leader schedule lasts for one 'epoch' amount of time (~2 days for Solana). this epoch is further divided into slots each lasting around 400 milliseconds, where each slot is assigned a specific leader to produce a block for that slot. 
+A leader schedule lasts for one 'epoch' amount of time (~2 days for Solana). This epoch is further divided into slots each lasting around 400 milliseconds, where each slot is assigned a specific leader to produce a block for that slot. 
 
 ![](2023-05-08-11-08-58.png)
 
-accessing this information in real time from any RPC is easy to do:
+Accessing this information in real-time from any RPC is easy to do:
 
 ```python 
 from solana.rpc.api import Client
@@ -45,9 +45,9 @@ print(client.get_epoch_info())
 print(client.get_leader_schedule())
 ```
 
-## code: constructing the leader schedule 
+## Code: constructing the leader schedule 
 
-we can also dive into the validator code base and see exactly how the leader schedule is constructed (code is fully explained in the comments):
+We can also dive into the validator code base and see exactly how the leader schedule is constructed (the code is fully explained in the comments):
 
 ```rust 
 // src: `ledger/src/leader_schedule_utils.rs`
@@ -113,59 +113,59 @@ impl LeaderSchedule {
 
 ## code: sending a transaction
 
-to process txs, the validator initiates a new `JsonRpcService` which initializes a `JsonRpcRequestProcessor` and a `SendTransactionService`. 
+To process txs, the validator initiates a new `JsonRpcService` which initializes a `JsonRpcRequestProcessor` and a `SendTransactionService`. 
 
-the **`JsonRpcRequestProcessor` service runs an http server** to receive all the RPC requests. when a `send_transaction` RPC request is received, it sends the transaction to the `SendTransactionService` using the `meta.transaction_sender` channel. 
+The **`JsonRpcRequestProcessor` service runs an HTTP server** to receive all the RPC requests. When a `send_transaction` RPC request is received, it sends the transaction to the `SendTransactionService` using the `meta.transaction_sender` channel. 
 
-the **`SendTransactionService` service loops through receiving new transactions and sending them upstream to upcoming leaders** (based on the leader schedule). This includes calling `get_tpu_addresses` to get the upcoming leader's TPU address and `send_transactions_in_batch` which sends the transactions to the leader's TPU.
+The **`SendTransactionService` service loops through receiving new transactions and sending them upstream to upcoming leaders** (based on the leader schedule). This includes calling `get_tpu_addresses` to get the upcoming leader's TPU address and `send_transactions_in_batch` which sends the transactions to the leader's TPU.
 
 ![](2023-05-08-11-18-25.png)
 
-# when RPCs stop working
+# When RPCs stop working
 
-one problem is if the RPC you rely on crashes or stops working (due to hardware failures, too many requests, etc) and you arent able to send txs to the leader anymore.
+One problem is if the RPC you rely on crashes or stops working (due to hardware failures, too many requests, etc) and you aren't able to send txs to the leader anymore.
 
-## rpc load-balancing: extrnode
+## RPC load-balancing: Extrnode
 
-one possible solution is to **maintain a list of RPCs and when one fails, you switch RPCs and query 
-ones that are still alive**. while this approach seems straightforward, it can be 
+One possible solution is to **maintain a list of RPCs and when one fails, you switch RPCs and query 
+ones that are still alive**. While this approach seems straightforward, it can be 
 costly to implement, involving managing multiple RPC links, implementing health checks, and 
 writing code to switch between RPCs in case of failure. 
 
-however, theres good news, the extrnode project has implemented exactly this as a independent service that can be run locally. even better, the code is open source and available on github 
-at [https://github.com/extrnode](https://github.com/extrnode). You can even find a list of hundreds of available RPC endpoints on their github. 
+However, there's good news, the Extrnode project has implemented exactly this as an independent service that can be run locally. Even better, the code is open source and available on GitHub 
+at [https://github.com/extrnode](https://github.com/extrnode). You can even find a list of hundreds of available RPC endpoints on their GitHub. 
 
 <div align="center">
 <img src="2023-05-08-11-33-54.png" width="450" height="350">
 </div>
 
-## how it works
+## How it works
 
-its also interesting to understand how they implemented this:
+It's also interesting to understand how they implemented this:
 - they first connect to a single full node RPC
   - then using the [`getClusterNodes` API call](https://docs.solana.com/api/http#getclusternodes), it queries the node to receive a list of all other nodes that node knowns through the gossip protocol
 - repeating this RPC call against all the new nodes, they can get the IP addresses of all the validator nodes on the network 
 - from this, they have a list of nodes which they can load-balance RPC requests between
 
-## other utilizations
+## Other utilizations
 
-other than load-balancing RPCs on failure, there are many other cool things you could do with this: 
+Other than load-balancing RPCs on failure, there are many other cool things you could do with this: 
 - improve the speed of requesting blocks/information by splitting your queries between nodes (avoid spamming a single RPC)
 - subscribe/send requests to nodes which are physically closer to you to reduce request latency
 - verify tx status' across many different nodes for extra confirmation
 - ... and likely much more
 
 
-## direct tx forwarding: mango's lite-rpc
+## Direct tx forwarding: mango's lite-rpc
 
-Another solution is to avoid the jump from client => RPC altogether by **sending it directly to the leader**.
+Another solution is to avoid the jump from client to RPC altogether by **sending it directly to the leader**.
 
 ![](2023-05-08-11-41-29.png)
 
-this would require constructing the leader schedule **locally** to know which node to forward your 
-transaction to. currently, this would require running a full node (with large hardware 
-requirements - not suitable for running locally), but mango is working on a solution called 
-'lite-rpc'. better yet, its also open source: [https://github.com/blockworks-foundation/lite-rpc](https://github.com/blockworks-foundation/lite-rpc)
+This would require constructing the leader schedule **locally** to know which node to forward your 
+transaction to. Currently, this would require running a full node (with large hardware 
+requirements - not suitable for running locally), but Mango is working on a solution called 
+'lite-rpc'. Better yet, its also open source: [https://github.com/blockworks-foundation/lite-rpc](https://github.com/blockworks-foundation/lite-rpc)
 
 
 # references 
