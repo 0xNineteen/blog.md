@@ -14,11 +14,13 @@
   - and the replay stage 
 - well cover what each of these stages are doing 
 
-![](2023-05-12-10-22-54.png)
+![](main.jpg)
 
 ## shred fetch stage
 
-![](2023-05-12-10-23-41.png)
+<div align="center">
+<img src="2023-05-12-10-23-41.png" width="250" height="250">
+</div>
 
 - the first stage is the 'shred fetch stage'
   - three ports are opened: 
@@ -33,7 +35,9 @@
 
 ## sigverify stage 
 
-![](2023-05-12-10-23-59.png)
+<div align="center">
+<img src="2023-05-12-10-23-59.png" width="500" height="100">
+</div>
 
 - the sigverify stage is straightforward, it verifies that the shreds from each slot are signed by the leader of that slot using either the GPU (if available) or the CPU
   - this is done in the `verify_packets` function located in `core/src/sigverify_shreds.rs`
