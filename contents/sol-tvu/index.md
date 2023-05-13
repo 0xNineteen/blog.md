@@ -1,8 +1,8 @@
 # Solana's TVU: the transaction-validating unit 
 
-One of the main components in Solana's validator node is the Transaction-Validating Unit (TVU) whos task is to verify, process, and vote on new blocks from the network. In this post, we will cover how the TVU works and its main stages. 
+One of the main components in Solana's validator node is the Transaction-Validating Unit (TVU) which is responsible for verifing, processing, and voting on new blocks from the network. In this post, we will cover the main stages of the TVU. 
 
-To follow along, this post uses commit `c5905f5`
+*note:* to follow along, this post uses commit `c5905f5`
 
 ## Background: leader schedules
 
@@ -31,7 +31,9 @@ we'll cover the details of how each of these stages/services work.
 ## the shred fetch stage
 
 The first stage is the `ShredFetchStage`, which receives shred packets from other nodes. These packets are either 
-received directly from the leader or forwarded by other nodes. Since a block is too large to directly transmit over UDP, Solana 
+received directly from the leader or forwarded by other nodes. 
+
+Since a block is too large to directly transmit over UDP, Solana 
 divides them into smaller chunks called shreds, which are sent through Solana's [Turbine](https://docs.solana.com/cluster/turbine-block-propagation) block propagation mechanism.
 
 <div align="center">
@@ -70,7 +72,7 @@ let fetch_stage = ShredFetchStage::new(
 
 For each of these sockets, new threads are spawned to receive packets using the `streamer::receiver` function and then are passed to the `::modify_packets` function to add meta-data including whether the packet should be discarded or not. 
 
-Several factors contribute to packet discard decisions, including a mismatch between the shred's `shred_version` 
+Several factors decide whether or not to discard a shred, including a mismatch between the shred's `shred_version` 
 and the validator's `shred_version`, if the shred has an invalid `slot`, and more. The full logic can be found within the `should_discard_shred` function.
 
 *note:* The `shred_version` references the hard forks that the validator has undergone.
@@ -215,10 +217,10 @@ To identify the incomplete shreds, the repair service scans the blockstore using
 </div>
 
 The replay stage plays a crucial role in processing new block transactions, reconstructing the state, and sending votes for new 
-blocks. While the `WindowService` includes shreds in the blockstore, the `ReplayStage` reads from the blockstore to construct new banks.
+blocks.
 
-The first step involves recording new slots from the blockstore into the bank_forks structure using the
-`::generate_new_bank_forks` function. The bank_forks structure represents the chain path, including forks. Each slot corresponds to a bank, which captures the state of the chain at that specific slot.
+The first step involves scanning for new slots from the blockstore and recording them into the bank_forks structure using the
+`::generate_new_bank_forks` function. The `bank_forks` structure holds all the slots in the chain, including forks. Each slot corresponds to a bank, which captures the state of the chain at that specific slot.
 
 For each new slot, its child bank is first cloned using `new_bank_from_parent_with_notify` and then transactions are processed to 
 generate the new state for that slot using the `replay_blockstore_into_bank` function.
