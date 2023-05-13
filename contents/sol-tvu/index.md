@@ -112,7 +112,9 @@ All the shreds are then sent to the `sigverify` stage through the `shred_fetch_s
 
 The sigverify stage verifies the authenticity of the shreds by ensuring they are signed by the leader of the corresponding slot (using either the GPU (if available) or the CPU) using the `verify_packets` function found in `core/src/sigverify_shreds.rs`.
 
-![](2023-05-13-17-05-35.png)
+<div align="center">
+<img src="2023-05-13-17-05-35.png" width="400" height="150">
+</div>
 
 ```rust 
 let shred_sigverify = sigverify_shreds::spawn_shred_sigverify(
@@ -146,7 +148,7 @@ After receiving verified shreds, the node computes its position in the Turbine t
 ## The window service 
 
 <div align="center">
-<img src="2023-05-13-17-06-07.png" width="400" height="250">
+<img src="2023-05-13-17-06-07.png" width="340" height="300">
 </div>
 
 The shreds from the sigverify stage are also sent to the `WindowService`. The window service stores new shreds within the 
@@ -200,13 +202,17 @@ Both shreds are directly inserted into the `blockstore`, while the code shreds a
 The repair service sends requests to other validators to retrieve missing shred data when the data was not received or 
 could not be reconstructed using code shreds. 
 
-![](2023-05-13-17-06-21.png)
+<div align="center">
+<img src="2023-05-13-17-06-21.png" width="280" height="150">
+</div>
 
 To identify the incomplete shreds, the repair service scans the blockstore using the functions `generate_repairs_for_slot` and `blockstore.find_missing_data_indexes(slot, ...)`. This scanning process identifies the incomplete shreds within the blockstore, enabling the repair service to request the missing data from other validators. 
 
 ## the replay stage 
 
-![](2023-05-13-17-06-32.png)
+<div align="center">
+<img src="2023-05-13-17-06-32.png" width="350" height="200">
+</div>
 
 The replay stage plays a crucial role in processing new block transactions, reconstructing the state, and sending votes for new 
 blocks. While the `WindowService` includes shreds in the blockstore, the `ReplayStage` reads from the blockstore to construct new banks.
