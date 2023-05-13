@@ -34,7 +34,9 @@ The first stage is the `ShredFetchStage`, which receives shred packets from othe
 received directly from the leader or forwarded by other nodes. Since a block is too large to directly transmit over UDP, Solana 
 divides them into smaller chunks called shreds, which are sent through Solana's [Turbine](https://docs.solana.com/cluster/turbine-block-propagation) block propagation mechanism.
 
-![](2023-05-13-17-05-07.png)
+<div align="center">
+<img src="2023-05-13-17-05-07.png" width="250" height="250">
+</div>
 
 To receive these packets, two main sockets are opened: the `tvu_socket` for receiving shreds and the `repair_socket` for handling repair responses. The repair service will be further discussed later on.
 
@@ -129,7 +131,9 @@ Once the shreds are verified, they are passed to two components: the `WindowServ
 
 The retransmit stage aims to transmit the received shreds to the rest of the network using Solana's Turbine protocol.
 
-![](2023-05-13-17-05-48.png)
+<div align="center">
+<img src="2023-05-13-17-05-48.png" width="400" height="250">
+</div>
 
 In Turbine, the network nodes are organized in a tree structure, with the leader of the current slot serving as the root. Nodes are positioned closer to the root if they hold a higher stake and further away if their stake is lower.
 
@@ -141,7 +145,9 @@ After receiving verified shreds, the node computes its position in the Turbine t
 
 ## The window service 
 
-![](2023-05-13-17-06-07.png)
+<div align="center">
+<img src="2023-05-13-17-06-07.png" width="400" height="250">
+</div>
 
 The shreds from the sigverify stage are also sent to the `WindowService`. The window service stores new shreds within the 
 `blockstore`. This process involves two main stages: removing duplicate shreds using the 
