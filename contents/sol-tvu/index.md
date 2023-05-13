@@ -1,10 +1,11 @@
-# TVU: tx validator unit 
+# Solana's TVU: the transaction-validating unit 
 
-While a Solana node is running, one of its main tasks is to receive new blocks from the network, verify them, process them, and vote on them. This is all done using the Transaction-Validating Unit (TVU).
+While a Solana node is running, one of its main components is the Transaction-Validating Unit (TVU) whos task is to verify, process, and vote on new blocks from the network. In this post, we will cover how the TVU works and its main stages. 
 
-In this post, we will cover how the TVU works and its main stages. To follow along, we will reference the codebase commit `c5905f5` and encourage you to search for the relevant functions and keywords mentioned in the codebase.
+To follow along, we will reference the codebase commit `c5905f5` and encourage you to search for the 
+relevant functions and keywords mentioned in the codebase.
 
-## background: leader schedules
+## Background: leader schedules
 
 if you need a refresher on leader schedules check out [this post](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-rpcs/index.md).
 
@@ -28,7 +29,7 @@ we'll cover the details of how each of these stages/services work.
 
 ![](main.jpg)
 
-## shred fetch stage
+## the shred fetch stage
 
 The first stage is the `ShredFetchStage`, which receives shred packets from other nodes. These packets are either 
 received directly from the leader or forwarded by other nodes. Since a block is too large to directly transmit over UDP, Solana 
@@ -104,7 +105,7 @@ impl ShredFetchStage {
 
 All the shreds are then sent to the `sigverify` stage through the `shred_fetch_sender` channel.
 
-## sigverify stage 
+## the sigverify stage 
 
 The sigverify stage verifies the authenticity of the shreds by ensuring they are signed by the leader of the corresponding slot (using either the GPU (if available) or the CPU) using the `verify_packets` function found in `core/src/sigverify_shreds.rs`.
 
@@ -121,7 +122,7 @@ let shred_sigverify = sigverify_shreds::spawn_shred_sigverify(
 
 Once the shreds are verified, they are passed to two components: the `WindowService` and the `RetransmitStage` using the `verified_sender` channel and the `retransmit_sender` channel respectively.
 
-## retransmit stage :: turbine
+## the retransmit stage
 
 The retransmit stage aims to transmit the received shreds to the rest of the network using Solana's Turbine protocol.
 
@@ -133,7 +134,7 @@ In Turbine, the network nodes are organized in a tree structure, with the leader
 
 After receiving verified shreds, the node computes its position in the Turbine tree to identify its neighbouring nodes and forward shreds directly to their TPU sockets. For example, in the diagram, node 3 would compute its neighbours as nodes 6, 9, and 12.
 
-## Window service 
+## The window service 
 
 The shreds from the sigverify stage are also sent to the `WindowService`. The window service stores new shreds within the 
 `blockstore`. This process involves two main stages: removing duplicate shreds using the 
@@ -181,14 +182,14 @@ Both shreds are directly inserted into the `blockstore`, while the code shreds a
 }
 ```
 
-## Repair service 
+## the repair service 
 
 The repair service sends requests to other validators to retrieve missing shred data when the data was not received or 
 could not be reconstructed using code shreds. 
 
 To identify the incomplete shreds, the repair service scans the blockstore using the functions `generate_repairs_for_slot` and `blockstore.find_missing_data_indexes(slot, ...)`. This scanning process identifies the incomplete shreds within the blockstore, enabling the repair service to request the missing data from other validators. 
 
-## replay stage 
+## the replay stage 
 
 The replay stage plays a crucial role in processing new block transactions, reconstructing the state, and sending votes for new 
 blocks. While the `WindowService` includes shreds in the blockstore, the `ReplayStage` reads from the blockstore to construct new banks.
