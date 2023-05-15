@@ -1,5 +1,4 @@
-## PBFT ordering 
-
+ 
 ## pbft
 
 - there are three main stages of PBFT 
