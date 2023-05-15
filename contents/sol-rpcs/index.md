@@ -175,3 +175,4 @@ requirements - not suitable for running locally), but Mango is working on a solu
 - [https://docs.solana.com/cluster/leader-rotation](https://docs.solana.com/cluster/leader-rotation)
 - [https://medium.com/solana-labs/gulf-stream-solanas-mempool-less-transaction-forwarding-protocol-d342e72186ad]( https://medium.com/solana-labs/gulf-stream-solanas-mempool-less-transaction-forwarding-protocol-d342e72186ad)
 - [https://jstarry.notion.site/Transaction-confirmation-d5b8f4e09b9c4a70a1f263f82307d7ce](https://jstarry.notion.site/Transaction-confirmation-d5b8f4e09b9c4a70a1f263f82307d7ce)
+- [https://www.shinobi-systems.com/primer.html](https://www.shinobi-systems.com/primer.html)
