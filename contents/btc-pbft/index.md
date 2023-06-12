@@ -18,7 +18,7 @@ off of)
 </div>
 
 - you need >= 2/3 votes for the vote period, and >= 2/3 commit message for the commit stage to pass
-- once the commit stage is passed, the block can be finalized because you know everyone has seen it
+- once the commit stage is passed, the block can be finalized
 
 #### why do we need the commit stage? 
 
