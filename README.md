@@ -2,9 +2,9 @@
 
 - [braindump: PBFT and blockchain consensus](https://github.com/0xNineteen/blog.md/blob/master/contents/btc-pbft/index.md): brain dump on some thoughts of PBFT and blockchain consensus algos (btc, tendermint, solana).
 
-- [Solana's TVU: the transaction-validating unit](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-tvu/index.md): overview of how Solana's TVU verifies, processes, and votes on new blocks from the network.
+- [Solana's Transaction Validating Unit (TVU)](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-tvu/index.md): overview of how Solana's TVU verifies, processes, and votes on new blocks from the network.
 
-- [Solana: Sending Transactions and Open-Source RPC Projects](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-rpcs/index.md): overview of how sending a tx to a RPC on solana works, and two interesting open source RPC projects.
+- [Sending Transactions and Open-Source RPC Projects on Solana](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-rpcs/index.md): overview of how sending a tx to a RPC on solana works, and two interesting open source RPC projects.
 
 - [ETH State Managment](https://github.com/0xNineteen/blog.md/blob/master/contents/eth-state/index.md): iteratively implements blockchain state storage, ultimately explaining how ETH does it. 
 
