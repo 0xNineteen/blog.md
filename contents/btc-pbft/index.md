@@ -78,6 +78,8 @@ and that it comes from the leader (checkout the
 - this took me a while to wrap my head around but the idea is getting 2/3 votes for a block which contains 2/3 votes basically the
 same as the commit stage
 
+*note:* i dont think this 'commit stage' is required for solana's consensus model (bc you dont have leader elections) but i thought was interesting none the less 
+
 ### optimistic 
 
 - notice how after block N is built and broadcasted, the network continues to generate new blocks that build ontop of it,
