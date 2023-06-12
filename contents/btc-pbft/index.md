@@ -73,8 +73,10 @@ and that it comes from the leader (checkout the
 *note:* these votes are normal transactions, and are included in on-chain compared to other off-chain voting methods 
 
 - this process is continued for future blocks 
-- when there are 2/3+ vote txs for the block in slot M then the block at slot N is confirmed 
+- when there are 2/3+ vote txs for the block in slot M then the block at slot N is confirmed (this is commit)
   - 2/3 of nodes have seen the 2/3 votes for block N
+- this took me a while to wrap my head around but the idea is getting 2/3 votes for a block which contains 2/3 votes basically the
+same as the commit stage
 
 ### optimistic 
 
