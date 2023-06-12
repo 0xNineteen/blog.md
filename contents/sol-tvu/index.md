@@ -1,4 +1,4 @@
-# Solana's TVU: the transaction-validating unit 
+# Solana's Transaction Validating Unit (TVU)
 
 One of the main components in Solana's validator node is the Transaction-Validating Unit (TVU) which is responsible for verifing, processing, and voting on new blocks from the network. In this post, we will cover the main stages of the TVU. 
 
