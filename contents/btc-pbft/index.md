@@ -14,7 +14,7 @@ off of)
     - "I have seen that everyone else has seen the block and knows its valid"
 
 <div align="center">
-<img src="2023-06-12-14-27-05.png" width="350" height="250">
+<img src="2023-06-12-14-27-05.png" width="550" height="450">
 </div>
 
 - you need >= 2/3 votes for the vote period, and >= 2/3 commit message for the commit stage to pass
