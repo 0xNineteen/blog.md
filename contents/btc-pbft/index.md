@@ -1,41 +1,84 @@
- 
-## pbft
+- this post will be basically a brain dump of some interesting thoughts 
+on consensus (less blockchain) + blockchains
 
-- there are three main stages of PBFT 
-  - pre-prepare: leader sends out a block of txs 
-  - prepare: group of validators send out votes for the block 
-    - I have seen the block and its valid
+## consensus: pbft / tendermint
+
+- the foundational paper on consensus is PBFT (which tendermint is largely based
+off of)
+
+- there are three main stages:
+  - propose: leader sends out a block of txs 
+  - vote: group of validators send out votes for the block 
+    - "I have seen the block and its valid"
   - commit: group of validators send out votes on the votes 
-    - I have seen that everyone else has seen the block and knows its valid
-- on leader changes PBFT uses the commit signatures to convince any other nodes of a new state 
-- the pre-prepare is obv required so people know of the state change 
-- the prepare is required to know if enough people have seen it and agree on it 
-- to know why the commit stage is required consider after the prepare stage one node recieves everyones votes but noone else recieves any - then the leader change occurs - the node with the votes will have a different state than the ones which never recieved the votes 
-  - the commit stage is used to prove that a majority have recieved the prepare votes (ie, they know the majority has voted)
+    - "I have seen that everyone else has seen the block and knows its valid"
 
-## btc: chains and implicit ordering
+<div align="center">
+<img src="2023-06-12-14-27-05.png" width="350" height="250">
+</div>
 
-- pbft orders blocks by agreeing on a sequence number 
-  - ie, pre-process and process (with signatures) include a few steps (not to be confused with above steps)
-    1. choosing a sequence number for the transaction 
-    2. leader broadcasts to the cluster **requesting** about a sequence number (preprocess) 
-    3. each node broadcasts to every other node that they agree on the sequence number (process)
+- you need >= 2/3 votes for the vote period, and >= 2/3 commit message for the commit stage to pass
+- once the commit stage is passed, the block can be finalized because you know everyone has seen it
 
-- btc works by hashing the block which includes a reference to the parent block's hash and then brodcasting it 
-  - since the hash includes the parents hash this inherently has ordering and is the same as a sequence number 
-    - ie, you dont need to request in step 2 of PBFT
-  - and since the block is fully hashed they know it hasnt been tampered with, it comes from the leader (ie, is a valid POW block)
-    - ie, you dont need signatures or step 3 in PBFT
-  - much more communication efficient! 
+#### why do we need the commit stage? 
 
-## solana
+- you may think, why do we even need the commit stage, if you receive 2/3 votes on the block, then you should be able to commit it 
+- the problem scenario where this doesnt work: 
+  - is if you are the only one to receive the 2/3 votes, and no-one else receives any:
+  - you end up updating your state, and noone else does (because they havent received any votes)
+  - eventually, a timeout will occur and a new leader election will happen 
+    - then you will have a state different from everyone else 
+  - in tendermint/pbft, this scenario is solved using commit messages to convince the rest of the cluster that 2/3 of the cluster has received 2/3 votes and modified their state
+  - and so you can reset for the last block which was committed
+- [SRC](https://cs.stackexchange.com/questions/54152/why-is-the-commit-phase-in-pbft-necessary)
 
-- understanding how solanas consensus works can be easier when compared to PBFT
-- solana does using an optimistic voting method 
-  - a block at slot N is broadcast (with a reference to its parent for ordering) (this is the pre-prepare)
-  - other nodes see the block, and generate vote txs on the block 
-  - these vote txs are included in some block in the future at slot M (M > N) (this is the prepare)
-    - 2/3 of nodes have seen the block and voted on it
-  - this process is continued for future blocks 
-  - when there are 2/3+ vote txs for the block in slot M then the block at slot N is confirmed 
-    - 2/3 of nodes have seen the 2/3 votes for block N
+## blockchains and implicit ordering: btc
+
+- another key idea in pbft is to order blocks by agreeing on a sequence number
+- in PBFT, the naming is slightly different than above instead of propose, vote, commit, its pre-prepare, prepare, commit
+- specifically, the pre-process and process stages include a few steps not mentioned in the above steps:
+  1. choosing a sequence number for the transaction 
+  2. leader broadcasts to the cluster **requesting** about a sequence number with its signature (preprocess) 
+  3. each node broadcasts to every other node that they agree on the sequence number (process)
+
+*note:* in step2 the leader signs all broadcasts, and in step3 the other nodes verify the signature with the expected leader of the schedule
+
+- this requires two main things 1) agreeing on sequence numbers and 2) verifying signatures of the leader
+- btc solves both these in a nice way 
+
+- btc works by hashing the block to be less than some value (< 0x000.. - three leading zeros), 
+along with a reference to the parent block's hash - its then broadcast to everyone
+
+- since the hash includes the parents hash this inherently has ordering and is the same as a sequence number 
+  - ie, solving 1) and removing the need for sequence numbers
+- and since block is hashed to be less than some value they know it hasnt been tampered with, 
+and that it comes from the leader (checkout the 
+[BTC as a clock post](https://github.com/0xNineteen/blog.md/blob/master/contents/btc-consensus/index.md) for more on this) 
+  - ie, solving 2) because you dont need signatures - your just verifying hashes
+
+## proof of history and optimistic voting: solana
+
+- solana's POH can also been viewed through the lens of PBFT 
+
+*note:* checkout this [post on solanas leader schedule](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-rpcs/index.md) for more
+
+- compared to btc and tendermint, solana uses a very cool optimistic voting method 
+
+- a block at slot N is broadcast (with a reference to its parent for ordering) (this is the pre-prepare)
+- other nodes see the block, and generate vote txs on the block 
+- these vote txs are included in some block in the future at slot M (M > N) 
+  - viewing these 2/3+ vote txs (can be across multiple slots) you know 2/3+ have seen that block (this is the prepare)
+  - these votes root the block at slot N 
+
+*note:* these votes are normal transactions, and are included in on-chain compared to other off-chain voting methods 
+
+- this process is continued for future blocks 
+- when there are 2/3+ vote txs for the block in slot M then the block at slot N is confirmed 
+  - 2/3 of nodes have seen the 2/3 votes for block N
+
+### optimistic 
+
+- notice how after block N is built and broadcasted, the network continues to generate new blocks that build ontop of it,
+even though it hasnt received all the votes
+- the network assumes the block will be valid, and continues to build off of it 
+- optimstic = fast 
