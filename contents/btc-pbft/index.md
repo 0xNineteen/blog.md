@@ -14,11 +14,11 @@ off of)
     - "I have seen that everyone else has seen the block and knows its valid"
 
 <div align="center">
-<img src="2023-06-12-14-27-05.png" width="350" height="250">
+<img src="2023-06-12-14-27-05.png" width="550" height="450">
 </div>
 
 - you need >= 2/3 votes for the vote period, and >= 2/3 commit message for the commit stage to pass
-- once the commit stage is passed, the block can be finalized because you know everyone has seen it
+- once the commit stage is passed, the block can be finalized
 
 #### why do we need the commit stage? 
 
@@ -73,8 +73,12 @@ and that it comes from the leader (checkout the
 *note:* these votes are normal transactions, and are included in on-chain compared to other off-chain voting methods 
 
 - this process is continued for future blocks 
-- when there are 2/3+ vote txs for the block in slot M then the block at slot N is confirmed 
+- when there are 2/3+ vote txs for the block in slot M then the block at slot N is confirmed (this is commit)
   - 2/3 of nodes have seen the 2/3 votes for block N
+- this took me a while to wrap my head around but the idea is getting 2/3 votes for a block which contains 2/3 votes basically the
+same as the commit stage
+
+*note:* i dont think this 'commit stage' is required for solana's consensus model (bc you dont have leader elections) but i thought was interesting none the less 
 
 ### optimistic 
 

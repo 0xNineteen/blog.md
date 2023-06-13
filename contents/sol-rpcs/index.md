@@ -1,4 +1,4 @@
-# Solana: Sending Transactions and Open-Source RPC Projects
+# Sending Transactions and Open-Source RPC Projects on Solana
 
 This post will be about recent RPC developments which I think are particularly cool within the Solana ecosystem:
   - Extrnode which is a RPC load balancer
