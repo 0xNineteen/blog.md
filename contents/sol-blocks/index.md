@@ -7,7 +7,7 @@
   - TVU: when you recieve a block from a leader and need to replay the results 
 
 ## TPU
-- we start with the TPU
+- we start with the TPU (starting at the top right)
 
 ### receiving txs 
 
@@ -41,7 +41,9 @@ previous stage
  (store the updated accounts, caches current stakers, collects validatore fees for block, etc.)
 - the second one is where things get interesting 
 
-### proof-of-history 
+*note:* the `bank`/`Bank` struct is used to represent a slot
+
+### proof-of-history and the `Entry` struct 
 
 - the reciever from `transaction_recorder.record_transactions` recieves a batch of txs to include in PoH
 - PoH is a infinite hash loop, and since hash functions are a one-way function, 
@@ -113,13 +115,34 @@ where they are
 *notice:* though we havent talked about it yet, in the TVU, shreds are recieved by 
 the network and stored in the blockstore - which are then later read - 
 notice how by storing the shreds in the blockstore even when you produced 
-the entries yourself, you can make use of the same codeflow as the TVU
+the entries yourself, you can make use of the same codeflow as the TVU - 
+this will make more sense when we talk about the TPUs flow 
+
+#### when are we no longer the leader 
+
+- the code stops producing blocks of txs after reaching the max PoH height which is decide by two things 
+  - either the max number of 'ticks' (hash loops) were produced
+  - or the bank was created more than ns_per_slot time ago 
+    - note: ns_per_slot is computed based on the max ticks per slot and 
+    the hash time 
+
+*note:* the PoH infinite loop will still continue, its just no new txs 
+will be included
+
+for example, say the block at slot 19 is ok, and the leader of slot 20 never 
+produces a block (bc its offline of smthn), if you start building a new block 
+for slot 21, you'll need to also share your PoH loop which covers the time 
+in slot 20 to prove you waited the full slot time before starting to produce 
+the block for slot 21
 
 ## TVU 
 
-- next, the TVU flow (top left)
-- see the [TVU post](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-tvu/index.md)
-for more info
-- it begins with the `ReplayStage` which continuously reads from the blockstore
-  - *note:* when shreds are recieved, 
-- 
+- next, the TVU flow (starting at the top left)
+- for more info on the TVU checkout [this post](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-tvu/index.md)
+  - if you dont want to read it, the tldr is shreds from the leaders TPU are
+  received on dedicated TVU sockets, verified they were signed by the leader, 
+  and stored in the blockstore
+- well start at the `ReplayStage` which continuously reads from the blockstore 
+for new shreds
+  
+### finding a bank to work on 
