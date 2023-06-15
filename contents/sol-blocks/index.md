@@ -41,7 +41,8 @@ previous stage
  (store the updated accounts, caches current stakers, collects validatore fees for block, etc.)
 - the second one is where things get interesting 
 
-*note:* the `bank`/`Bank` struct is used to represent a slot
+*note:* the `bank`/`Bank` struct is used to represent a slot, including all the accounts 
+state at that slot 
 
 ### proof-of-history and the `Entry` struct 
 
@@ -142,7 +143,58 @@ the block for slot 21
   - if you dont want to read it, the tldr is shreds from the leaders TPU are
   received on dedicated TVU sockets, verified they were signed by the leader, 
   and stored in the blockstore
-- well start at the `ReplayStage` which continuously reads from the blockstore 
-for new shreds
-  
-### finding a bank to work on 
+- we'll start at the `ReplayStage` which replays entries' txs to 
+reproduce the state which the leader propogated to the network 
+
+### finding a bank to replay
+
+- the most important fcn is `replay_active_banks` which reads from the `bank_forks` variable
+  - the `bank_forks` variable is a major var in the codebase - it organizes all the node's banks
+  - *note:* a bank is either frozen: read-only and cannot be modified, or active:
+  its state can be modified
+- the first thing the fcn does is find all 'active' banks in the bank_forks var
+
+### reading from the blockstore
+
+- the next thing is for each of these active banks, query the blockstore 
+for the associated entries with that bank's slot using `blockstore::get_slot_entries_with_shred_info`
+  - *note:* since entries aren't all propogated at once, the blockstore 
+    wont always have all the entries, so calling the above 
+    fcn is guaranteed to return all the entries - the solution is to track the 
+    progress of what entry indexs have been processed and keep the bank as 
+    active until all the entries have been processed (which is exactly what the
+    `ConfirmationProgress` struct does)
+    - once all the entries have been processed, the bank will be frozen and will 
+    no longer be considered in the replay loop 
+- from these entries, we then verify all is good: ie, certain 
+properties hold (`::verify_ticks`), the entries are a valid PoH chain 
+(`hash([last_hash, tx_root]) == entry.hash`), and that all the transactions include 
+valid signatures
+
+### replaying a bank
+
+- we now have a batch of verified PoH entries for a specific slot which we 
+want to process
+
+*note:* since TPU blocks (whos state have already been processed) are also 
+following this code flow, before fully replaying the block, we only fully replay 
+a bank if `bank.collector_id() != my_pubkey`
+
+- to process the entries the code uses `::process_entries`
+  - which loops through the entries and either registers ticks (entries with no txs)
+    or processes transactions (txs)
+- ticks: each tick is registered, and on the last tick, that entries hash is 
+- txs: processing txs uses the same fcns as the TPU 
+(`load_and_execute_transactions` and `commit_transactions`)
+recorded as the 'blockhash'
+
+### freezing banks
+
+- after the replay is complete, if the bank is complete
+(enough ticks have been registered), its frozen (using `bank.freeze()`)
+  - freezing a bank, hashes its internal state, and makes it read-only 
+  - the interal hash consists of the parent's bank hash, a hash of the accounts modified, 
+  the signature count, and the blockhash of the entries 
+  - if all is valid, validators produce votes as signatures on bankhashes
+
+*note:* TPU banks are also frozen here
