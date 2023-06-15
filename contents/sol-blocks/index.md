@@ -19,7 +19,7 @@ We'll start with the TPU (the top right in the diagram)
 
 
 In solana, there is no mempool, txs are forwarded directly to the leader.
-So, starting a validator, dedicated ports are opened to receive these txs
+So, when starting a validator, dedicated ports are opened to receive these txs
 including:
   - `tpu`, `vote`, and `tpu_forwards` sockets
   - the tpu socket is for normal txs (eg, { send token A to bob })
@@ -44,27 +44,30 @@ and other times a small number of txs
 This stage is responsible for building new blocks from the txs received from 
 the previous stage.
 
+*note:* the `bank`/`Bank` struct is used to represent accounts and metadata per slot
+so the *bank*ing stage is responsible for building a valid bank
+
 We wont go in-depth on the code for this bc it should be a post on its own
 but there are three main stages:
   - executing txs to get a new state: `bank.load_and_execute_transactions`
-  - sending txs to the proof-of-history (PoH) generator: `transaction_recorder.record_transactions`:  
+  - sending txs to the proof-of-history (PoH) generator: `transaction_recorder.record_transactions`
   - and recording other info related to the 
   block (storing the updated accounts, caching current stakers, collecting 
   validator fees, etc.): `bank.commit_transactions`
  
 The first and third are fairly straightforward at a high level, the second one is where things get interesting
 
-*note:* the `bank`/`Bank` struct is used to represent accounts and metadata per slot
-
 ### proof-of-history and the `Entry` struct 
 
-The receiver from the previous stage's `transaction_recorder.
-record_transactions` receives a batch of txs and aims to produce a PoH 
-hashchain.
+The receiver from the previous stage's 
+`transaction_recorder.record_transactions` 
+receives a batch of txs and aims to produce a PoH hashchain.
 
 PoH, at a high-level, is an infinite hash loop which hashes itself over and 
 over. And since hash functions are 
 one-way functions, the hash loop is a proof that some time has passed.
+This passage of time acts as a consistent clock, which in turn runs the 
+leader schedule. 
   
 The loop produces hash entries which are either 1) a loop of empty hashes or 2) a loop with tx hashes mixed into it.
 The key structure representing this is the `Entry` struct:
@@ -148,8 +151,8 @@ block into smaller chunks called shreds first. these shreds go to two places:
 including all shreds
 
 *notice:* though we havent talked about it yet, in the TVU, shreds are received by 
-the network and stored in the blockstore - which are then later read - 
-notice how by storing the shreds in the blockstore even when you produced 
+the network and stored in the blockstore - which are then later read ---
+so notice how by storing the shreds in the blockstore in the TPU too, even when you produced 
 the entries yourself, you can make use of the same codeflow as the TVU - 
 this will make more sense when we talk about the TPUs flow 
 
@@ -216,6 +219,7 @@ while true:
   # only process active banks
   active_banks = state.get_active_banks()
 
+  # note: this loop can also be done in parallel 
   for bank in active_banks: 
     # process the unprocessed entries 
     (entries, indexs) = blockstore.get_entries_for_slot(bank.slot(), start_index=bank.progress.last_index)
@@ -235,7 +239,7 @@ while true:
 frozen (and so no longer active) and will no longer be considered in the 
 replay loop.
 
-from these entries, we then verify all is good: ie, certain 
+we then need to verify the entries are valid: ie, certain 
 properties hold (`::verify_ticks`), the entries are a valid PoH chain 
 (`hash([last_hash, tx_root]) == entry.hash`), all the transactions include 
 valid signatures, and then begin to process them
