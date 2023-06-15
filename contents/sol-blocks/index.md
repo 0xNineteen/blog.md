@@ -6,9 +6,9 @@ This post will explain how blocks are built in solana using the diagram below as
 
 Theres two main stages for blocks in solana: 
   - The Transaction Processing Unit (TPU): this stage is for when you **are a leader**
-  and need to build your own block
+  and need to build a block
   - The Transaction Validation Unit (TVU): this stage is for when you **are not 
-  a leader**, and you recieve a block from a leader, and need to replay the block 
+  a leader**, and you receive a block from a leader, and need to replay the block 
   to reproduce the state
 
 ## TPU Flow
@@ -27,24 +27,24 @@ including:
     - votes are a special transaction which only validators send - 
     when a validator sends a vote tx they are saying that a specific block 
     is valid (the tx data includes the hash of the block which they are voting for)
-  - the tpu_forwards socket is less important for this post, so well leave it alone
+  - the tpu_forwards socket is less important for this post, so we'll leave it alone
 
-txs and votes are recieved, sigantures are verified, and are then sent to the 
+txs and votes are received, signatures are verified and are then sent to the 
 `BankingStage`
 
-*note:* txs are sent to the banking stage in batches, **as they're recieved**, so sometimes
+*note:* txs are sent to the banking stage in batches, **as they're received**, so sometimes
 the banking stage will be operating on a large number of txs, 
-and othertimes a small number of txs
+and other times a small number of txs
 
 *note:* for more info on how txs flow checkout
 [this post](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-rpcs/index.md)
 
 ### banking stage 
 
-This stage is responsible for building new blocks from the txs recieved from 
+This stage is responsible for building new blocks from the txs received from 
 the previous stage.
 
-We wont go indepth on the code for this bc it should be a post on its own
+We wont go in-depth on the code for this bc it should be a post on its own
 but there are three main stages:
   - executing txs to get a new state: `bank.load_and_execute_transactions`
   - sending txs to the proof-of-history (PoH) generator: `transaction_recorder.record_transactions`:  
@@ -52,19 +52,19 @@ but there are three main stages:
   block (storing the updated accounts, caching current stakers, collecting 
   validator fees, etc.): `bank.commit_transactions`
  
-The first and third are fairly straighforward at a high level, the second one is where things get interesting
+The first and third are fairly straightforward at a high level, the second one is where things get interesting
 
 *note:* the `bank`/`Bank` struct is used to represent accounts and metadata per slot
 
 ### proof-of-history and the `Entry` struct 
 
-The reciever from the previous stage's `transaction_recorder.
-record_transactions` recieves a batch of txs and aims to produce a PoH 
+The receiver from the previous stage's `transaction_recorder.
+record_transactions` receives a batch of txs and aims to produce a PoH 
 hashchain.
 
-PoH, at a high-level, is a infinite hash loop which hashes itself over and 
-over. And since hash functions are a 
-one-way function, the hash loop records a proof that some time has passed.
+PoH, at a high-level, is an infinite hash loop which hashes itself over and 
+over. And since hash functions are 
+one-way functions, the hash loop is a proof that some time has passed.
   
 The loop produces hash entries which are either 1) a loop of empty hashes or 2) a loop with tx hashes mixed into it.
 The key structure representing this is the `Entry` struct:
@@ -83,19 +83,19 @@ pub struct Entry {
 ```
 
 Each entry builds off the hash of the previous entry and so 
-  - the first entry begins the hash off the last block's `blockhash` 
+  - the first entry begins the hash of the last block's `blockhash` 
   - the second begins off the first entry's hash 
   - ... 
-  - the last entries final hash is that block's `blockhash`
+  - the last entry's final hash is that block's `blockhash`
 
-The goal is to create a `Vec<Entry>` which represent a block/slot. 
+The goal is to create a `Vec<Entry>` which represents a block/slot. 
 
 ### mixing txs into the PoH
 
-Its also worth it to understand how exactly txs are included / mixed in to 
+Its also worth it to understand how exactly txs are included/mixed-in to 
 an `Entry`.
 
-Each batch of txs are hashed using a merkle tree using the tx signature (which 
+Each batch of txs is hashed using a merkle tree using the tx signature (which 
 is just a signed hash of the tx message). The merkle root of this tree 
 would uniquely represent the batch of txs. The merkle root is then sent to 
 be 'mixed in' with the PoH.
@@ -133,36 +133,36 @@ broadcast(shreds)
 blockstore.store(shreds)
 ```
 
-
 ### broadcasting entries and wtf is a shred
 
+as these entries are produced, they are given to the `BroadcastStage` 
+to be broadcasted to the rest of the network.
 
-- as these entries are produced, they are given to the `BroadcastStage` 
-where they are
-  - turned into shreds 
-    - since blocks are too big to send over UDP directly, solana chunks a block into 
-  smaller data chunks (called shreds) which are broadcasted
-  - these shreds are sent to the local nodes blockstore 
-    - the blockstore stores a bunch of useful metadata on the chain including
-    the shreds
-  - these shreds are also transmitted to other node's TVUs in the network
+since blocks are too big to send over UDP directly, solana splits a 
+block into smaller chunks called shreds first. these shreds go to two places: 
 
-*notice:* though we havent talked about it yet, in the TVU, shreds are recieved by 
+1) they are sent to the local nodes blockstore.
+2) they are transmitted to other node's TVUs in the network using turbine
+
+*note:* the blockstore stores a bunch of useful metadata about the chain 
+including all shreds
+
+*notice:* though we havent talked about it yet, in the TVU, shreds are received by 
 the network and stored in the blockstore - which are then later read - 
 notice how by storing the shreds in the blockstore even when you produced 
 the entries yourself, you can make use of the same codeflow as the TVU - 
 this will make more sense when we talk about the TPUs flow 
 
-#### when are we no longer the leader 
+### when are we no longer the leader
 
-- the code stops producing blocks of txs after reaching the max PoH height which is decide by two things 
+the node stops producing blocks of txs after reaching the max PoH height which is decided by two things:
   - either the max number of 'ticks' (hash loops) were produced
   - or the bank was created more than ns_per_slot time ago 
     - note: ns_per_slot is computed based on the max ticks per slot and 
-    the hash time 
+    the time it takes to produce a single hash
 
-*note:* the PoH infinite loop will still continue, its just no new txs 
-will be included
+*note:* even when were no longer the leader, the PoH infinite loop will 
+still continue, just no new txs will be mixed in
 
 for example, say the block at slot 19 is ok, and the leader of slot 20 never 
 produces a block (bc its offline of smthn), if you start building a new block 
@@ -172,63 +172,106 @@ the block for slot 21
 
 ## TVU 
 
-- next, the TVU flow (starting at the top left)
-- for more info on the TVU checkout [this post](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-tvu/index.md)
-  - if you dont want to read it, the tldr is shreds from the leaders TPU are
-  received on dedicated TVU sockets, verified they were signed by the leader, 
-  and stored in the blockstore
-- we'll start at the `ReplayStage` which replays entries' txs to 
-reproduce the state which the leader propogated to the network 
+Next, we'll dive into how the TVU works (starting at the top left of the 
+diagram).
+
+for some background on the TVU, checkout [this post](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-tvu/index.md)
+
+- if you dont want to read that post, the tldr is: shreds from the leaders TPU are
+received on dedicated TVU sockets, verified they were signed by the leader, 
+and stored in the blockstore.
+
+we'll start at the `ReplayStage` which replays entry txs to 
+reproduce the state which the leader propagated to the network
 
 ### finding a bank to replay
 
-- the most important fcn is `replay_active_banks` which reads from the `bank_forks` variable
-  - the `bank_forks` variable is a major var in the codebase - it organizes all the node's banks
-  - *note:* a bank is either frozen: read-only and cannot be modified, or active:
-  its state can be modified
-- the first thing the fcn does is find all 'active' banks in the bank_forks var
+One of the most important functions in the replay stage is 
+`::replay_active_banks` which reads from the `bank_forks` variable to find 
+banks that should be worked on.
 
-### reading from the blockstore
+the `bank_forks` variable is a major variable in the codebase and is
+responsible for organizing all the node's banks.
 
-- the next thing is for each of these active banks, query the blockstore 
-for the associated entries with that bank's slot using `blockstore::get_slot_entries_with_shred_info`
-  - *note:* since entries aren't all propogated at once, the blockstore 
-    wont always have all the entries, so calling the above 
-    fcn is guaranteed to return all the entries - the solution is to track the 
-    progress of what entry indexs have been processed and keep the bank as 
-    active until all the entries have been processed (which is exactly what the
-    `ConfirmationProgress` struct does)
-    - once all the entries have been processed, the bank will be frozen and will 
-    no longer be considered in the replay loop 
-- from these entries, we then verify all is good: ie, certain 
+*note:* a bank is either frozen: read-only and cannot be modified, or active:
+its state can be modified -- a bank is always initialized as active -- we'll cover how a bank is frozen later
+
+the first thing the fcn does is find all 'active' banks in the bank_forks var,
+which loops over the banks and takes the blocks which aren't frozen
+
+### reading entries from the blockstore
+
+after finding active banks, for each of these active banks, we query the 
+blockstore for the associated entries using `blockstore::get_slot_entries_with_shred_info`
+
+*note:* since entries aren't all propagated at once, the blockstore 
+wont always have all the entries, so calling the above 
+fcn is not guaranteed to return all the entries - the solution is to track the 
+progress of what entry index have been processed, only process new entries on the next loop, and keep the bank as 
+active until all the entries have been processed (which is exactly what the
+`ConfirmationProgress` struct does)
+
+```python 
+while true: 
+  # only process active banks
+  active_banks = state.get_active_banks()
+
+  for bank in active_banks: 
+    # process the unprocessed entries 
+    (entries, indexs) = blockstore.get_entries_for_slot(bank.slot(), start_index=bank.progress.last_index)
+
+    ## to be explained
+    verify(entries)
+    process(entries)
+
+    # track the progress of processing entries 
+    bank.progress.last_index = indexs[-1]
+
+    if indexs[-1].is_last_index(): 
+      bank.freeze()
+```
+
+*note:* once all the entries of a bank have been processed, the bank will be 
+frozen (and so no longer active) and will no longer be considered in the 
+replay loop.
+
+from these entries, we then verify all is good: ie, certain 
 properties hold (`::verify_ticks`), the entries are a valid PoH chain 
-(`hash([last_hash, tx_root]) == entry.hash`), and that all the transactions include 
-valid signatures
+(`hash([last_hash, tx_root]) == entry.hash`), all the transactions include 
+valid signatures, and then begin to process them
 
-### replaying a bank
+### processing entries and replaying a bank
 
-- we now have a batch of verified PoH entries for a specific slot which we 
+we now have a batch of verified PoH entries for a specific slot which we 
 want to process
 
-*note:* since TPU blocks (whos state have already been processed) are also 
+*note:* since TPU blocks (whose state has already been processed) are also 
 following this code flow, before fully replaying the block, we only fully replay 
-a bank if `bank.collector_id() != my_pubkey`
+a bank if `bank.collector_id() != my_pubkey` (ie, you werent the leader for that bank)
 
-- to process the entries the code uses `::process_entries`
-  - which loops through the entries and either registers ticks (entries with no txs)
-    or processes transactions (txs)
-- ticks: each tick is registered, and on the last tick, that entries hash is 
-- txs: processing txs uses the same fcns as the TPU 
+to process the entries the code uses `::process_entries` which loops through 
+the entries and either registers ticks (entries with no txs - `ticks`)
+or processes transactions in the entries (`txs`):
+- `ticks`: each tick is registered and on the last tick, that entries hash is 
+recorded as that bank's `blockhash`
+- `txs`: processing txs uses the same fcns as the TPU 
 (`load_and_execute_transactions` and `commit_transactions`)
-recorded as the 'blockhash'
 
 ### freezing banks
 
-- after the replay is complete, if the bank is complete
-(enough ticks have been registered), its frozen (using `bank.freeze()`)
-  - freezing a bank, hashes its internal state, and makes it read-only 
-  - the interal hash consists of the parent's bank hash, a hash of the accounts modified, 
-  the signature count, and the blockhash of the entries 
-  - if all is valid, validators produce votes as signatures on bankhashes
+after all the ticks and txs are processed, if the bank is complete
+(enough ticks have been registered/have processed all the entries), its frozen (using `bank.freeze()`)
+
+this is the long arrow on the left side of the diagram
+
+freezing a bank, hashes its internal state (which is called a `bankhash`) and 
+makes it read-only. a bank's internal hash consists of the parent's bank hash, 
+a hash of the accounts modified, the signature count, and its `blockhash`.
 
 *note:* TPU banks are also frozen here
+
+if all of this is works ok, and the block is valid, then validators produce vote transactions which are a signature on a bank's `bankhash`. 
+
+## fin
+
+thanks for reading! :) 
