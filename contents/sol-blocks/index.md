@@ -1,28 +1,38 @@
-- post will be explaining how blocks are built in solana with the following diagram
+# Building Blocks in Solana
+
+This post will explain how blocks are built in solana using the diagram below as a reference
 
 ![](2023-06-13-11-04-48.png)
 
-- theres two main stages
-  - TPU: when you are a leader and building blocks 
-  - TVU: when you recieve a block from a leader and need to replay the results 
+Theres two main stages for blocks in solana: 
+  - The Transaction Processing Unit (TPU): this stage is for when you **are a leader**
+  and need to build your own block
+  - The Transaction Validation Unit (TVU): this stage is for when you **are not 
+  a leader**, and you recieve a block from a leader, and need to replay the block 
+  to reproduce the state
 
-## TPU
-- we start with the TPU (starting at the top right)
+## TPU Flow
+
+We'll start with the TPU (the top right in the diagram)
 
 ### receiving txs 
 
-- starting a validator, ports are opened to receive txs 
-  - this includes, tpu, tpu_forwards, and vote sockets
+
+In solana, there is no mempool, txs are forwarded directly to the leader.
+So, starting a validator, dedicated ports are opened to receive these txs
+including:
+  - `tpu`, `vote`, and `tpu_forwards` sockets
   - the tpu socket is for normal txs (eg, { send token A to bob })
   - the vote socket is only for votes 
     - votes are a special transaction which only validators send - 
     when a validator sends a vote tx they are saying that a specific block 
     is valid (the tx data includes the hash of the block which they are voting for)
-  - the tpu_forwards socket is less important for this post, so well leave it
-- txs are recieved, sigantures on votes are verified, and are then sent to the 
+  - the tpu_forwards socket is less important for this post, so well leave it alone
+
+txs and votes are recieved, sigantures are verified, and are then sent to the 
 `BankingStage`
 
-*note:* txs are sent in batches as they're recieved, so sometimes
+*note:* txs are sent to the banking stage in batches, **as they're recieved**, so sometimes
 the banking stage will be operating on a large number of txs, 
 and othertimes a small number of txs
 
