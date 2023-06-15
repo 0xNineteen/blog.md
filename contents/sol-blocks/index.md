@@ -41,27 +41,33 @@ and othertimes a small number of txs
 
 ### banking stage 
 
-- this stage is responsible for building new blocks from the txs recieved from the 
-previous stage
-- we wont go indepth on the code for this (bc it should be a post on its own)
-- but there are three main stages:
-  - `bank.load_and_execute_transactions`: executes to get new state
-  - `transaction_recorder.record_transactions`: sends to proof-of-history generator 
-  - `bank.commit_transactions`: updates other info related to a block
- (store the updated accounts, caches current stakers, collects validatore fees for block, etc.)
-- the second one is where things get interesting 
+This stage is responsible for building new blocks from the txs recieved from 
+the previous stage.
 
-*note:* the `bank`/`Bank` struct is used to represent a slot, including all the accounts 
-state at that slot 
+We wont go indepth on the code for this bc it should be a post on its own
+but there are three main stages:
+  - executing txs to get a new state: `bank.load_and_execute_transactions`
+  - sending txs to the proof-of-history (PoH) generator: `transaction_recorder.record_transactions`:  
+  - and recording other info related to the 
+  block (storing the updated accounts, caching current stakers, collecting 
+  validator fees, etc.): `bank.commit_transactions`
+ 
+The first and third are fairly straighforward at a high level, the second one is where things get interesting
+
+*note:* the `bank`/`Bank` struct is used to represent accounts and metadata per slot
 
 ### proof-of-history and the `Entry` struct 
 
-- the reciever from `transaction_recorder.record_transactions` recieves a batch of txs to include in PoH
-- PoH is a infinite hash loop, and since hash functions are a one-way function, 
-this loop record a proof that some time has passed 
-  - the loop produces entries which are either a loop of hashes which include tx hashes in the hash 
-  or just a plain loop of hashes (with no txs)
-  - this is the key struct: `Entry`
+The reciever from the previous stage's `transaction_recorder.
+record_transactions` recieves a batch of txs and aims to produce a PoH 
+hashchain.
+
+PoH, at a high-level, is a infinite hash loop which hashes itself over and 
+over. And since hash functions are a 
+one-way function, the hash loop records a proof that some time has passed.
+  
+The loop produces hash entries which are either 1) a loop of empty hashes or 2) a loop with tx hashes mixed into it.
+The key structure representing this is the `Entry` struct:
 
 ```rust 
 pub struct Entry {
@@ -71,47 +77,65 @@ pub struct Entry {
     /// The SHA-256 hash `num_hashes` after the previous Entry ID.
     pub hash: Hash,
 
-    /// An unordered list of transactions that were observed before the Entry ID was
-    /// generated. They may have been observed before a previous Entry ID but were
-    /// pushed back into this list to ensure deterministic interpretation of the ledger.
+    /// An unordered list of transactions
     pub transactions: Vec<VersionedTransaction>,
 }
 ```
-- This creates a sequential hash list of `Entry` structs which have a pointer 
-to the previous entries hash and a list of txs 
-    - the first entry begins the hash off the last block's `blockhash` 
-    - the second begins off the first entry's hash 
-    - ... 
-    - the last entries final hash is that block's `blockhash`
-- relative to other blockchains, in solana, a collection of these entries is a block
+
+Each entry builds off the hash of the previous entry and so 
+  - the first entry begins the hash off the last block's `blockhash` 
+  - the second begins off the first entry's hash 
+  - ... 
+  - the last entries final hash is that block's `blockhash`
+
+The goal is to create a `Vec<Entry>` which represent a block/slot. 
+
+### mixing txs into the PoH
+
+Its also worth it to understand how exactly txs are included / mixed in to 
+an `Entry`.
+
+Each batch of txs are hashed using a merkle tree using the tx signature (which 
+is just a signed hash of the tx message). The merkle root of this tree 
+would uniquely represent the batch of txs. The merkle root is then sent to 
+be 'mixed in' with the PoH.
+
+![](2023-06-13-11-30-35.png)
+
+Below is pseudocode of what we want to do: 
 
 ```python 
+# start entry hash = previous blocks last entry hash
 parent_hash = state.get_parent(slot)
 last_hash = parent_hash
+
+# produce the PoH entry loop
 entries = []
-while true: 
-    txs = state.receive_new_txs()?
-    tx_root = compute_merkle_root(txs)
-    entry_hash = hash([last_hash, tx_root])
+while should_produce_block: 
+    txs: Vec<Transaction> = state.receive_new_txs()?
+
+    if txs.is_not_empty():
+      tx_root = compute_merkle_root(txs)
+      entry_hash = hash([last_hash, tx_root])
+    else: 
+      entry_hash = hash([last_hash])
+
     entries.push(Entry { entry_hash, txs })
 
+    # make it a chain
     last_hash = entry_hash 
-block = entries # different terminology
+
+# these entries now represent a full block/slot
 
 # explained soon
-shreds = shred_entries(block)
+shreds = shred_entries(entries)
 broadcast(shreds)
 blockstore.store(shreds)
 ```
 
-- how are txs included in the entries? 
-- each batch of txs are hashed using a merkle tree of the tx signatures
-  - the tx signature is a signed hash of the message 
-  - each leaf would be a signature 
-  - the merkle root would uniquely represent the batch of txs 
-  - the merkle root is then sent to be 'mixed in' with the PoH
 
-![](2023-06-13-11-30-35.png)
+### broadcasting entries and wtf is a shred
+
 
 - as these entries are produced, they are given to the `BroadcastStage` 
 where they are
