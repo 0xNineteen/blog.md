@@ -1,4 +1,4 @@
-# Building Blocks in Solana
+# Building Blocks in the Solana-Labs Validator
 
 this post will explain how blocks are built in the solana-labs client using the 
 diagram below as a reference:

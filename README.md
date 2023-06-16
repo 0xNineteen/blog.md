@@ -1,6 +1,6 @@
 # blog.md
 
-- [Blocks in Solana](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-blocks/index.md): how blocks are built in the solana-labs validator client.
+- [Building Blocks in the Solana-Labs Validator](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-blocks/index.md): how blocks are built in the solana-labs validator client.
 
 - [Solana's Transaction Validating Unit (TVU)](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-tvu/index.md): overview of how Solana's TVU verifies, processes, and votes on new blocks from the network.
 
