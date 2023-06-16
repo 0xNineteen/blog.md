@@ -1,22 +1,22 @@
 # Building Blocks in Solana
 
-This post will explain how blocks are built in solana using the diagram below as a reference
+This post will explain how blocks are built in solana-labs client using the 
+diagram below as a reference:
 
 ![](2023-06-13-11-04-48.png)
 
-Theres two main stages for blocks in solana: 
-  - The Transaction Processing Unit (TPU): this stage is for when you **are a leader**
+Theres two main stages when producing blocks:
+  - The Transaction Processing Unit (TPU) stage: when you **are a leader**
   and need to build a block
-  - The Transaction Validation Unit (TVU): this stage is for when you **are not 
-  a leader**, and you receive a block from a leader, and need to replay the block 
-  to reproduce the state
+  - and The Transaction Validation Unit (TVU) stage: when you **are not 
+  a leader**, and you receive a block from a leader, and need to replay the 
+  block to reproduce the state
 
 ## TPU Flow
 
 We'll start with the TPU (the top right in the diagram)
 
 ### receiving txs 
-
 
 In solana, there is no mempool, txs are forwarded directly to the leader.
 So, when starting a validator, dedicated ports are opened to receive these txs
@@ -39,7 +39,7 @@ and other times a small number of txs
 *note:* for more info on how txs flow checkout
 [this post](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-rpcs/index.md)
 
-### banking stage 
+### the banking stage 
 
 This stage is responsible for building new blocks from the txs received from 
 the previous stage.
@@ -69,18 +69,19 @@ one-way functions, the hash loop is a proof that some time has passed.
 This passage of time acts as a consistent clock, which in turn runs the 
 leader schedule. 
   
-The loop produces hash entries which are either 1) a loop of empty hashes or 2) a loop with tx hashes mixed into it.
+**The loop produces hash entries which are either 1) a loop of empty hashes or 2) a loop with tx hashes mixed into it.**
 The key structure representing this is the `Entry` struct:
 
 ```rust 
 pub struct Entry {
-    /// The number of hashes since the previous Entry ID.
+    /// The number of hashes used in this entry
     pub num_hashes: u64,
 
-    /// The SHA-256 hash `num_hashes` after the previous Entry ID.
+    /// The final SHA-256 hash `num_hashes` after the previous Entry ID.
     pub hash: Hash,
 
-    /// An unordered list of transactions
+    /// An unordered list of transactions which were mixed into the hash 
+    /// either 1) an empty vector (ie, a Tick) or 2) a Vec<txs>
     pub transactions: Vec<VersionedTransaction>,
 }
 ```
@@ -95,8 +96,8 @@ The goal is to create a `Vec<Entry>` which represents a block/slot.
 
 ### mixing txs into the PoH
 
-Its also worth it to understand how exactly txs are included/mixed-in to 
-an `Entry`.
+Its also worth it to understand how txs are included/mixed-in to 
+produce an `Entry`.
 
 Each batch of txs is hashed using a merkle tree using the tx signature (which 
 is just a signed hash of the tx message). The merkle root of this tree 
@@ -115,6 +116,7 @@ last_hash = parent_hash
 # produce the PoH entry loop
 entries = []
 while should_produce_block: 
+    # recieved from the banking stage
     txs: Vec<Transaction> = state.receive_new_txs()?
 
     if txs.is_not_empty():
@@ -142,17 +144,20 @@ as these entries are produced, they are given to the `BroadcastStage`
 to be broadcasted to the rest of the network.
 
 since blocks are too big to send over UDP directly, solana splits a 
-block into smaller chunks called shreds first. these shreds go to two places: 
+block into smaller chunks called **shreds**. these shreds go to two places: 
 
-1) they are sent to the local nodes blockstore.
+1) they are sent to the blockstore
 2) they are transmitted to other node's TVUs in the network using turbine
 
-*note:* the blockstore stores a bunch of useful metadata about the chain 
+*note:* the blockstore is a local rocksDB database, and stores a bunch of 
+useful metadata about the chain, 
 including all shreds
 
-*notice:* though we havent talked about it yet, in the TVU, shreds are received by 
+*notice:* though we havent talked about it yet, in the TVU, shreds are 
+received by 
 the network and stored in the blockstore - which are then later read ---
-so notice how by storing the shreds in the blockstore in the TPU too, even when you produced 
+so notice how by storing the shreds in the blockstore in the TPU too, even 
+when you produced 
 the entries yourself, you can make use of the same codeflow as the TVU - 
 this will make more sense when we talk about the TPUs flow 
 
@@ -193,7 +198,7 @@ One of the most important functions in the replay stage is
 `::replay_active_banks` which reads from the `bank_forks` variable to find 
 banks that should be worked on.
 
-the `bank_forks` variable is a major variable in the codebase and is
+at a highlevel, the `bank_forks` variable is
 responsible for organizing all the node's banks.
 
 *note:* a bank is either frozen: read-only and cannot be modified, or active:
@@ -210,8 +215,9 @@ blockstore for the associated entries using `blockstore::get_slot_entries_with_s
 *note:* since entries aren't all propagated at once, the blockstore 
 wont always have all the entries, so calling the above 
 fcn is not guaranteed to return all the entries - the solution is to track the 
-progress of what entry index have been processed, only process new entries on the next loop, and keep the bank as 
-active until all the entries have been processed (which is exactly what the
+progress (using the index of the last-processed entry), and only process 
+entries with a larger index on the next loop, and lastly freezing the bank 
+when all the entries have been processed (which is exactly what the
 `ConfirmationProgress` struct does)
 
 ```python 
@@ -236,13 +242,15 @@ while true:
 ```
 
 *note:* once all the entries of a bank have been processed, the bank will be 
-frozen (and so no longer active) and will no longer be considered in the 
+frozen (and thus, no longer 'active') and so it wont be considered in the 
 replay loop.
 
-we then need to verify the entries are valid: ie, certain 
-properties hold (`::verify_ticks`), the entries are a valid PoH chain 
+after getting the entries, we then need to verify the entries are valid: ie, 
+certain 
+properties hold (using the `::verify_ticks` fcn), that the entries are a valid 
+PoH chain 
 (`hash([last_hash, tx_root]) == entry.hash`), all the transactions include 
-valid signatures, and then begin to process them
+valid signatures
 
 ### processing entries and replaying a bank
 
@@ -254,11 +262,11 @@ following this code flow, before fully replaying the block, we only fully replay
 a bank if `bank.collector_id() != my_pubkey` (ie, you werent the leader for that bank)
 
 to process the entries the code uses `::process_entries` which loops through 
-the entries and either registers ticks (entries with no txs - `ticks`)
+the entries and either registers ticks (entries with no txs)
 or processes transactions in the entries (`txs`):
-- `ticks`: each tick is registered and on the last tick, that entries hash is 
+- on a `tick` entry: each tick is registered and on the last tick, that entries hash is 
 recorded as that bank's `blockhash`
-- `txs`: processing txs uses the same fcns as the TPU 
+- on a `tx` entry: processing txs uses the same fcns as the TPU 
 (`load_and_execute_transactions` and `commit_transactions`)
 
 ### freezing banks
@@ -269,8 +277,11 @@ after all the ticks and txs are processed, if the bank is complete
 this is the long arrow on the left side of the diagram
 
 freezing a bank, hashes its internal state (which is called a `bankhash`) and 
-makes it read-only. a bank's internal hash consists of the parent's bank hash, 
-a hash of the accounts modified, the signature count, and its `blockhash`.
+makes it read-only. a bank's internal hash consists of the following: 
+- the parent's bank hash (putting the chain in block-chain)
+- a hash of the accounts modified (recording the state)
+- the signature count (something to do with dynamic fees?)
+- and its `blockhash` (recording the PoH and txs included)
 
 *note:* TPU banks are also frozen here
 
