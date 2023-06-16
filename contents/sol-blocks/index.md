@@ -1,24 +1,24 @@
 # Building Blocks in Solana
 
-This post will explain how blocks are built in solana-labs client using the 
+this post will explain how blocks are built in the solana-labs client using the 
 diagram below as a reference:
 
 ![](2023-06-13-11-04-48.png)
 
-Theres two main stages when producing blocks:
-  - The Transaction Processing Unit (TPU) stage: when you **are a leader**
+theres two main stages when producing blocks:
+  - the Transaction Processing Unit (TPU) stage: when you **are a leader**
   and need to build a block
   - and The Transaction Validation Unit (TVU) stage: when you **are not 
-  a leader**, and you receive a block from a leader, and need to replay the 
+  a leader**, and you receive a block from a leader and need to replay the 
   block to reproduce the state
 
 ## TPU Flow
 
-We'll start with the TPU (the top right in the diagram)
+we'll start with the TPU (the top right in the diagram)
 
 ### receiving txs 
 
-In solana, there is no mempool, txs are forwarded directly to the leader.
+in solana, there is no mempool, txs are forwarded directly to the leader.
 So, when starting a validator, dedicated ports are opened to receive these txs
 including:
   - `tpu`, `vote`, and `tpu_forwards` sockets
@@ -170,10 +170,10 @@ the node stops producing blocks of txs after reaching the max PoH height which i
     the time it takes to produce a single hash
 
 *note:* even when were no longer the leader, the PoH infinite loop will 
-still continue, just no new txs will be mixed in
+continue, just no new txs will be mixed in
 
 for example, say the block at slot 19 is ok, and the leader of slot 20 never 
-produces a block (bc its offline of smthn), if you start building a new block 
+produces a block (bc its offline or smthn), if you start building a new block 
 for slot 21, you'll need to also share your PoH loop which covers the time 
 in slot 20 to prove you waited the full slot time before starting to produce 
 the block for slot 21
@@ -190,7 +190,7 @@ received on dedicated TVU sockets, verified they were signed by the leader,
 and stored in the blockstore.
 
 we'll start at the `ReplayStage` which replays entry txs to 
-reproduce the state which the leader propagated to the network
+reproduce the state that the leader propagated to the network
 
 ### finding a bank to replay
 
