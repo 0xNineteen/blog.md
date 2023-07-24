@@ -4,6 +4,8 @@ One of the main components in Solana's validator node is the Transaction-Validat
 
 *note:* to follow along, this post uses commit `c5905f5`
 
+![](main.jpg)
+
 ## Background: leader schedules
 
 If you need a refresher on leader schedules check out [this post](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-rpcs/index.md).
@@ -25,8 +27,6 @@ The initialization of the TVU sets up several stages, including:
 we'll cover the details of how each of these stages/services work.
 
 *note:* there are more stages we won't cover in this article.
-
-![](main.jpg)
 
 ## the shred fetch stage
 
