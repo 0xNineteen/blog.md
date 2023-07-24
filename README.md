@@ -6,7 +6,7 @@
 
 - [Sending Transactions and Open-Source RPC Projects on Solana](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-rpcs/index.md): how sending a tx to a RPC on solana works, and two interesting open source RPC projects.
 
-- [ETH State Managment: Trees, Treis, Tries](https://github.com/0xNineteen/blog.md/blob/master/contents/eth-state/index.md): iteratively implements blockchain state storage, ultimately explaining how ETH does it. 
+- [ETH State Managment: Trees, Treis, Tries](https://github.com/0xNineteen/blog.md/blob/master/contents/eth-state/index.md): iteratively implements blockchain state storage, ultimately explaining how ETH does it.
 
 - [Zero-fee, Zero-slippage, Revenue Generating, Perps Dex](https://github.com/0xNineteen/blog.md/blob/master/contents/zero-fee-dexs/index.md): how we can build a zero-fee, zero-slippage, perps dex that still earns $$.
 
