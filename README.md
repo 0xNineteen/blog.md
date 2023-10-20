@@ -1,5 +1,9 @@
 # blog.md
 
+- [How Solana's Gossip Protocol Works](https://blog.syndica.io/sig-engineering-1-gossip-protocol/): technical explainer on Solana's gossip protocol and its implemented in the rust codebase.
+
+- [Annoucement: Sig: Solana's 3rd Validator](https://blog.syndica.io/introducing-sig-by-syndica-an-rps-focused-solana-validator-client-written-in-zig/): were building a Solana node in Zig from scratch! also includes why and how were gonna build it.
+
 - [Building Blocks in the Solana-Labs Validator](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-blocks/index.md): how blocks are built in the solana-labs validator client.
 
 - [Solana's Transaction Validating Unit (TVU)](https://github.com/0xNineteen/blog.md/blob/master/contents/sol-tvu/index.md): how Solana's TVU verifies, processes, and votes on new blocks from the network.
