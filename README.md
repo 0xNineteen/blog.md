@@ -36,6 +36,9 @@
 
 --- 
 
+- [More Solana Rust Client Diagrams](https://github.com/0xNineteen/blog.md/blob/master/contents/diagram-dump/index.md): rando diagrams which never made it into a blogpost but still
+could be useful.
+
 - [braindump: PBFT and blockchain consensus](https://github.com/0xNineteen/blog.md/blob/master/contents/btc-pbft/index.md): brain dump on some thoughts of PBFT and blockchain consensus algos (btc, tendermint, solana).
 
 - [Random Gists](https://gist.github.com/0xNineteen): rando code snippets 
