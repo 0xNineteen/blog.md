@@ -1,5 +1,7 @@
 # blog.md
 
+- [Sig Progress Update on AccountsDB, RPC, Gossip](https://blog.syndica.io/sig-engineering-part-2-accountsdb-more/): were talking about fast Zig implementations of hashmaps, preallocating memory, and more!
+
 - [How Solana's Gossip Protocol Works](https://blog.syndica.io/sig-engineering-1-gossip-protocol/): technical explainer on Solana's gossip protocol and how its implemented.
 
 - [Sig: Solana's 3rd Validator](https://blog.syndica.io/introducing-sig-by-syndica-an-rps-focused-solana-validator-client-written-in-zig/): were building a Solana node in Zig from scratch! also includes why and how were gonna build it.
