@@ -1,5 +1,9 @@
 # blog.md
 
+- [Agave: AccountsDB Deep Dive](https://www.anza.xyz/blog/a-deep-dive-into-solana-s-accountsdb): explainer on how Agave's accountsDB works - we needed to understand how Agave worked first before starting Sig's AccountsDB implementation, which as a consequence lead to organizing docs on Agave. 
+
+- [Sig: AccountsDB Deep Dive](https://blog.syndica.io/sig-engineering-part-3-solanas-accountsdb/): explainer on how Sig's accountsDB works and how we optimized it in Zig (including benchmark results).
+
 - [Sig: Progress Update on AccountsDB, RPC, Gossip](https://blog.syndica.io/sig-engineering-part-2-accountsdb-more/): a lot of Zig content including fast hashmap implementations, preallocating memory, and more (the accounts-db section was me).
 
 - [Sig: How Solana's Gossip Protocol Works](https://blog.syndica.io/sig-engineering-1-gossip-protocol/): technical explainer on Solana's gossip protocol and how its implemented.
