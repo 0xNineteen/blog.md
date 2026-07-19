@@ -1,6 +1,6 @@
 # blog.md
 
-- [WTF is PLONK](https://github.com/0xNineteen/plonk-tutorial/blob/main/blog.md): tutorial explaining how PLONK works with a simple circuit.
+- [WTF is PLONK](https://github.com/0xNineteen/plonk-tutorial/blob/main/blog.md): how PLONK works for ZK proofs with a simple circuit.
 
 - [Agave: AccountsDB Deep Dive](https://www.anza.xyz/blog/a-deep-dive-into-solana-s-accountsdb): explainer on how Agave's accountsDB works - we needed to understand how Agave worked first before starting Sig's AccountsDB implementation, which as a consequence lead to organizing docs on Agave. 
 
